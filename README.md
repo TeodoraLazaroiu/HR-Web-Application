@@ -1,7 +1,7 @@
 # HR-Web-Application
 web application development project using ASP.NET 6
 
-![hr-diagram drawio](https://user-images.githubusercontent.com/79518275/179964947-483ed4f1-b05b-4607-8e2a-52f752ed0ca8.png)
+![](hr-diagram.drawio.png)
 
 ## Cerinte
 
