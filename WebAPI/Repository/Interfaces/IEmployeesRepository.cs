@@ -1,9 +1,10 @@
-﻿using HRAPI.Models.DTOs;
-using HRAPI.Models.Entities;
+﻿using WebAPI.Models.DTOs;
+using WebAPI.Models.Entities;
 
-namespace HRAPI.Repository.Interfaces
+namespace WebAPI.Repository.Interfaces
 {
     public interface IEmployeesRepository : IGenericRepository<Employee>
     {
+        Task<Employee?> GetEmployeeByFullName(string firstName, string lastName);
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace HRAPI.Repository.Interfaces
+﻿namespace WebAPI.Repository.Interfaces
 {
     public interface IGenericRepository<T>
     {

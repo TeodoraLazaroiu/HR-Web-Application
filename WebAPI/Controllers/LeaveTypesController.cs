@@ -1,119 +1,102 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using HRAPI.Data;
-using HRAPI.Models.Entities;
+using WebAPI.Models.DTOs;
+using WebAPI.Models.Entities;
+using WebAPI.Repository.Interfaces;
 
-namespace HRAPI.Controllers
+namespace WebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class LeaveTypesController : ControllerBase
     {
-        private readonly DataContext _context;
+        private readonly IUnitOfWork unitOfWork;
 
-        public LeaveTypesController(DataContext context)
+        public LeaveTypesController(IUnitOfWork unitOfWork)
         {
-            _context = context;
+            this.unitOfWork = unitOfWork;
         }
 
         // GET: api/LeaveTypes
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<LeaveType>>> GetLeaveTypes()
+        public async Task<ActionResult<IEnumerable<LeaveTypeDTO>>> GetLeaveTypes()
         {
-          if (_context.LeaveTypes == null)
-          {
-              return NotFound();
-          }
-            return await _context.LeaveTypes.ToListAsync();
+            var leaveTypes = (await unitOfWork.LeaveTypes.GetAll()).Select(a => new LeaveTypeDTO(a)).ToList();
+            return leaveTypes;
         }
 
-        // GET: api/LeaveTypes/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<LeaveType>> GetLeaveType(int id)
+        // GET: api/LeaveTypes/name
+        [HttpGet("{name}")]
+        public async Task<ActionResult<LeaveTypeDTO>> GetLeaveType(string name)
         {
-          if (_context.LeaveTypes == null)
-          {
-              return NotFound();
-          }
-            var leaveType = await _context.LeaveTypes.FindAsync(id);
+            var leaveType = await unitOfWork.LeaveTypes.GetLeaveTypeByName(name);
 
             if (leaveType == null)
             {
-                return NotFound();
+                return NotFound("Leave Type with this name doesn't exist");
             }
 
-            return leaveType;
+            return new LeaveTypeDTO(leaveType);
         }
 
-        // PUT: api/LeaveTypes/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutLeaveType(int id, LeaveType leaveType)
+        // PUT: api/LeaveTypes/city
+        [HttpPut("{name}")]
+        public async Task<IActionResult> PutLeaveType(string name, LeaveTypeDTO leaveType)
         {
-            if (id != leaveType.Id)
+            var leaveTypeInDb = await unitOfWork.LeaveTypes.GetLeaveTypeByName(name);
+
+            if (leaveTypeInDb == null)
             {
-                return BadRequest();
+                return NotFound("Leave Type with this name doesn't exist");
             }
 
-            _context.Entry(leaveType).State = EntityState.Modified;
+            leaveTypeInDb.LeaveName = leaveType.LeaveName;
+            leaveTypeInDb.NumberOfDays = leaveType.NumberOfDays;
+            leaveTypeInDb.Description = leaveType.Description;
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!LeaveTypeExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            await unitOfWork.LeaveTypes.Update(leaveTypeInDb);
+            unitOfWork.Save();
 
-            return NoContent();
+            return Ok();
         }
 
         // POST: api/LeaveTypes
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<LeaveType>> PostLeaveType(LeaveType leaveType)
+        public async Task<ActionResult<LeaveTypeDTO>> PostLeaveType(LeaveTypeDTO leaveType)
         {
-          if (_context.LeaveTypes == null)
-          {
-              return Problem("Entity set 'DataContext.LeaveTypes'  is null.");
-          }
-            _context.LeaveTypes.Add(leaveType);
-            await _context.SaveChangesAsync();
+            var leaveTypeInDb = await unitOfWork.LeaveTypes.GetLeaveTypeByName(leaveType.LeaveName);
 
-            return CreatedAtAction("GetLeaveType", new { id = leaveType.Id }, leaveType);
-        }
-
-        // DELETE: api/LeaveTypes/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteLeaveType(int id)
-        {
-            if (_context.LeaveTypes == null)
+            if (leaveTypeInDb != null)
             {
-                return NotFound();
-            }
-            var leaveType = await _context.LeaveTypes.FindAsync(id);
-            if (leaveType == null)
-            {
-                return NotFound();
+                return NotFound("Leave Type with this name already exist");
             }
 
-            _context.LeaveTypes.Remove(leaveType);
-            await _context.SaveChangesAsync();
+            var leaveTypeToAdd = new LeaveType();
+            leaveTypeToAdd.LeaveName = leaveType.LeaveName;
+            leaveTypeToAdd.NumberOfDays = leaveType.NumberOfDays;
+            leaveTypeToAdd.Description = leaveType.Description;
 
-            return NoContent();
+
+            await unitOfWork.LeaveTypes.Create(leaveTypeToAdd);
+            unitOfWork.Save();
+
+            return Ok();
         }
 
-        private bool LeaveTypeExists(int id)
+        // DELETE: api/LeaveTypes/name
+        [HttpDelete("{name}")]
+        public async Task<IActionResult> DeleteLeaveType(string name)
         {
-            return (_context.LeaveTypes?.Any(e => e.Id == id)).GetValueOrDefault();
+            var leaveTypeInDb = await unitOfWork.LeaveTypes.GetLeaveTypeByName(name);
+
+            if (leaveTypeInDb == null)
+            {
+                return NotFound("Leave Type with this name doesn't exist");
+            }
+
+            await unitOfWork.LeaveTypes.Delete(leaveTypeInDb);
+            unitOfWork.Save();
+
+            return Ok();
         }
     }
 }

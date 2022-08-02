@@ -1,117 +1,105 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using HRAPI.Data;
-using HRAPI.Models.Entities;
+using WebAPI.Models.DTOs;
+using WebAPI.Models.Entities;
+using WebAPI.Repository.Interfaces;
 
-namespace HRAPI.Controllers
+namespace WebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class LocationsController : ControllerBase
     {
-        private readonly DataContext _context;
+        private readonly IUnitOfWork unitOfWork;
 
-        public LocationsController(DataContext context)
+        public LocationsController(IUnitOfWork unitOfWork)
         {
-            _context = context;
+            this.unitOfWork = unitOfWork;
         }
 
         // GET: api/Locations
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Location>>> GetLocations()
+        public async Task<ActionResult<IEnumerable<LocationDTO>>> GetLocations()
         {
-          if (_context.Locations == null)
-          {
-              return NotFound();
-          }
-            return await _context.Locations.ToListAsync();
+            var locations = (await unitOfWork.Locations.GetAll()).Select(a => new LocationDTO(a)).ToList();
+            return locations;
         }
 
-        // GET: api/Locations/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Location>> GetLocation(int id)
+        // GET: api/Locations/city
+        [HttpGet("{city}")]
+        public async Task<ActionResult<LocationDTO>> GetLocation(string city)
         {
-          if (_context.Locations == null)
-          {
-              return NotFound();
-          }
-            var location = await _context.Locations.FindAsync(id);
+            var location = await unitOfWork.Locations.GetLocationByCity(city);
 
             if (location == null)
             {
-                return NotFound();
+                return NotFound("Location with this city doesn't exist");
             }
 
-            return location;
+            return new LocationDTO(location);
         }
 
-        // PUT: api/Locations/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutLocation(int id, Location location)
+        // PUT: api/Locations/city
+        [HttpPut("{city}")]
+        public async Task<IActionResult> PutLocation(string city, LocationDTO location)
         {
-            if (id != location.Id)
+            var locationInDb = await unitOfWork.Locations.GetLocationByCity(city);
+
+            if (locationInDb == null)
             {
-                return BadRequest();
+                return NotFound("Location with this city doesn't exist");
             }
 
-            _context.Entry(location).State = EntityState.Modified;
+            locationInDb.City = location.City;
+            locationInDb.Country = location.Country;
+            locationInDb.PostalCode = location.PostalCode;
+            locationInDb.Street = location.Street;
+            locationInDb.Number = location.Number;
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!LocationExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            await unitOfWork.Locations.Update(locationInDb);
+            unitOfWork.Save();
 
-            return NoContent();
+            return Ok();
         }
 
         // POST: api/Locations
         [HttpPost]
-        public async Task<ActionResult<Location>> PostLocation(Location location)
+        public async Task<ActionResult<LocationDTO>> PostLocation(LocationDTO location)
         {
-          if (_context.Locations == null)
-          {
-              return Problem("Entity set 'DataContext.Locations'  is null.");
-          }
-            _context.Locations.Add(location);
-            await _context.SaveChangesAsync();
+            var locationInDb = await unitOfWork.Locations.GetLocationByCity(location.City);
 
-            return CreatedAtAction("GetLocation", new { id = location.Id }, location);
-        }
-
-        // DELETE: api/Locations/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteLocation(int id)
-        {
-            if (_context.Locations == null)
+            if (locationInDb != null)
             {
-                return NotFound();
-            }
-            var location = await _context.Locations.FindAsync(id);
-            if (location == null)
-            {
-                return NotFound();
+                return NotFound("Location with this city already exist");
             }
 
-            _context.Locations.Remove(location);
-            await _context.SaveChangesAsync();
+            var locationToAdd = new Location();
+            locationToAdd.City = location.City;
+            locationToAdd.Country = location.Country;
+            locationToAdd.PostalCode = location.PostalCode;
+            locationToAdd.Street = location.Street;
+            locationToAdd.Number = location.Number;
 
-            return NoContent();
+            await unitOfWork.Locations.Create(locationToAdd);
+            unitOfWork.Save();
+
+            return Ok();
         }
 
-        private bool LocationExists(int id)
+        // DELETE: api/Locations/city
+        [HttpDelete("{city}")]
+        public async Task<IActionResult> DeleteLocation(string city)
         {
-            return (_context.Locations?.Any(e => e.Id == id)).GetValueOrDefault();
+            var locationInDb = await unitOfWork.Locations.GetLocationByCity(city);
+
+            if (locationInDb == null)
+            {
+                return NotFound("Location with this city doesn't exist");
+            }
+
+            await unitOfWork.Locations.Delete(locationInDb);
+            unitOfWork.Save();
+
+            return Ok();
         }
     }
 }

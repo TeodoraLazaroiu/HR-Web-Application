@@ -1,117 +1,101 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using HRAPI.Data;
-using HRAPI.Models.Entities;
+using WebAPI.Models.DTOs;
+using WebAPI.Models.Entities;
+using WebAPI.Repository.Interfaces;
 
-namespace HRAPI.Controllers
+namespace WebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class TeamsController : ControllerBase
     {
-        private readonly DataContext _context;
+        private readonly IUnitOfWork unitOfWork;
 
-        public TeamsController(DataContext context)
+        public TeamsController(IUnitOfWork unitOfWork)
         {
-            _context = context;
+            this.unitOfWork = unitOfWork;
         }
 
         // GET: api/Teams
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Team>>> GetTeams()
+        public async Task<ActionResult<IEnumerable<TeamDTO>>> GetTeams()
         {
-          if (_context.Teams == null)
-          {
-              return NotFound();
-          }
-            return await _context.Teams.ToListAsync();
+            var teams = (await unitOfWork.Teams.GetAll()).Select(a => new TeamDTO(a)).ToList();
+            return teams;
         }
 
-        // GET: api/Teams/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Team>> GetTeam(int id)
+        // GET: api/Teams/name
+        [HttpGet("{name}")]
+        public async Task<ActionResult<TeamDTO>> GetTeamByName(string name)
         {
-          if (_context.Teams == null)
-          {
-              return NotFound();
-          }
-            var team = await _context.Teams.FindAsync(id);
+            var team = await unitOfWork.Teams.GetTeamByName(name);
 
             if (team == null)
             {
-                return NotFound();
+                return NotFound("Team with this name doesn't exist");
             }
 
-            return team;
+            return new TeamDTO(team);
         }
 
-        // PUT: api/Teams/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutTeam(int id, Team team)
+        // PUT: api/Teams/name
+        [HttpPut("{name}")]
+        public async Task<IActionResult> PutTeam(string name, TeamDTO team)
         {
-            if (id != team.Id)
+            var teamInDb = await unitOfWork.Teams.GetTeamByName(name);
+
+            if (teamInDb == null)
             {
-                return BadRequest();
+                return NotFound("Team with this name doesn't exist");
             }
 
-            _context.Entry(team).State = EntityState.Modified;
+            teamInDb.TeamName = team.TeamName;
+            teamInDb.TeamLeadId = team.TeamLeadId;
+            teamInDb.LocationId = team.LocationId;
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!TeamExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            await unitOfWork.Teams.Update(teamInDb);
+            unitOfWork.Save();
 
-            return NoContent();
+            return Ok();
         }
 
         // POST: api/Teams
         [HttpPost]
-        public async Task<ActionResult<Team>> PostTeam(Team team)
+        public async Task<ActionResult<TeamDTO>> PostTeam(TeamDTO team)
         {
-          if (_context.Teams == null)
-          {
-              return Problem("Entity set 'DataContext.Teams'  is null.");
-          }
-            _context.Teams.Add(team);
-            await _context.SaveChangesAsync();
+            var teamInDb = await unitOfWork.Teams.GetTeamByName(team.TeamName);
 
-            return CreatedAtAction("GetTeam", new { id = team.Id }, team);
-        }
-
-        // DELETE: api/Teams/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteTeam(int id)
-        {
-            if (_context.Teams == null)
+            if (teamInDb != null)
             {
-                return NotFound();
-            }
-            var team = await _context.Teams.FindAsync(id);
-            if (team == null)
-            {
-                return NotFound();
+                return NotFound("Team with this name already exist");
             }
 
-            _context.Teams.Remove(team);
-            await _context.SaveChangesAsync();
+            var teamToAdd = new Team();
+            teamToAdd.TeamName = team.TeamName;
+            teamToAdd.TeamLeadId = team.TeamLeadId;
+            teamToAdd.LocationId = team.LocationId;
 
-            return NoContent();
+            await unitOfWork.Teams.Create(teamToAdd);
+            unitOfWork.Save();
+
+            return Ok();
         }
 
-        private bool TeamExists(int id)
+        // DELETE: api/Teams/name
+        [HttpDelete("{name}")]
+        public async Task<IActionResult> DeleteTeam(string name)
         {
-            return (_context.Teams?.Any(e => e.Id == id)).GetValueOrDefault();
+            var teamInDb = await unitOfWork.Teams.GetTeamByName(name);
+
+            if (teamInDb == null)
+            {
+                return NotFound("Team with this name doesn't exist");
+            }
+
+            await unitOfWork.Teams.Delete(teamInDb);
+            unitOfWork.Save();
+
+            return Ok();
         }
     }
 }

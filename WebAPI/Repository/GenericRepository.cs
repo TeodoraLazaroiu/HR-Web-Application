@@ -1,8 +1,8 @@
-﻿using HRAPI.Data;
-using HRAPI.Repository.Interfaces;
+﻿using WebAPI.Data;
+using WebAPI.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace HRAPI.Repository
+namespace WebAPI.Repository
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {

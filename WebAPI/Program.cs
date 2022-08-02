@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using HRAPI.Data;
-using HRAPI.Repository.Interfaces;
-using HRAPI.Repository;
+using WebAPI.Data;
+using WebAPI.Repository.Interfaces;
+using WebAPI.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 

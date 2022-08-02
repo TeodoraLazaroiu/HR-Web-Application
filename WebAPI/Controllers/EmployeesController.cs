@@ -1,11 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using HRAPI.Data;
-using HRAPI.Models.Entities;
-using HRAPI.Models.DTOs;
-using HRAPI.Repository.Interfaces;
+using WebAPI.Models.Entities;
+using WebAPI.Models.DTOs;
+using WebAPI.Repository.Interfaces;
 
-namespace HRAPI.Controllers
+namespace WebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -26,29 +24,29 @@ namespace HRAPI.Controllers
             return employees;
         }
 
-        // GET: api/Employees/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<EmployeeDTO>> GetEmployee(int id)
+        // GET: api/Employees/firstName/lastName
+        [HttpGet("{firstName}/{lastName}")]
+        public async Task<ActionResult<EmployeeDTO>> GetEmployeeByFullName(string firstName, string lastName)
         {
-            var employee = await unitOfWork.Employees.GetById(id);
+            var employee = await unitOfWork.Employees.GetEmployeeByFullName(firstName, lastName);
 
             if (employee == null)
             {
-                return NotFound("Employee with this id doesn't exist");
+                return NotFound("Employee with this name doesn't exist");
             }
 
             return new EmployeeDTO(employee);
         }
 
         // PUT: api/Employees/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutEmployee(int id, EmployeeDTO employee)
+        [HttpPut("{firstName}/{lastName}")]
+        public async Task<IActionResult> PutEmployee(string firstName, string lastName, EmployeeDTO employee)
         {
-            var employeeInDb = await unitOfWork.Employees.GetById(id);
+            var employeeInDb = await unitOfWork.Employees.GetEmployeeByFullName(firstName, lastName);
 
             if (employeeInDb == null)
             {
-                return BadRequest("Employee with this id doesn't exist");
+                return BadRequest("Employee with this name doesn't exist");
             }
 
             employeeInDb.FirstName = employee.FirstName;
@@ -67,42 +65,47 @@ namespace HRAPI.Controllers
         }
 
         // POST: api/Employees
-        [HttpPost]
-        public async Task<ActionResult<Employee>> PostEmployee(Employee employee)
+       [HttpPost]
+        public async Task<ActionResult<EmployeeDTO>> PostEmployee(EmployeeDTO employee)
         {
-          if (_context.Employees == null)
-          {
-              return Problem("Entity set 'DataContext.Employees'  is null.");
-          }
-            _context.Employees.Add(employee);
-            await _context.SaveChangesAsync();
+            var employeeIdDb = await unitOfWork.Employees.GetEmployeeByFullName(employee.FirstName, employee.LastName);
 
-            return CreatedAtAction("GetEmployee", new { id = employee.EmployeeId }, employee);
-        }
-
-        // DELETE: api/Employees/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteEmployee(int id)
-        {
-            if (_context.Employees == null)
+            if (employeeIdDb != null)
             {
-                return NotFound();
-            }
-            var employee = await _context.Employees.FindAsync(id);
-            if (employee == null)
-            {
-                return NotFound();
+                return BadRequest("Employee with this name already exists");
             }
 
-            _context.Employees.Remove(employee);
-            await _context.SaveChangesAsync();
+            var employeeToAdd = new Employee();
+            employeeToAdd.FirstName = employee.FirstName;
+            employeeToAdd.LastName = employee.LastName;
+            employeeToAdd.EmailAddress = employee.EmailAddress;
+            employeeToAdd.BirthDate = employee.BirthDate;
+            employeeToAdd.TeamId = employee.TeamId;
+            employeeToAdd.CurrentJobId = employee.CurrentJobId;
+            employeeToAdd.HireDate = employee.HireDate;
+            employeeToAdd.Salary = employee.Salary;
 
-            return NoContent();
+            await unitOfWork.Employees.Create(employeeToAdd);
+            unitOfWork.Save();
+
+            return Ok();
         }
 
-        private bool EmployeeExists(int id)
+        // DELETE: api/Employees/firstName/lastName
+        [HttpDelete("{firstName}/{lastName}")]
+        public async Task<IActionResult> DeleteEmployee(string firstName, string lastName)
         {
-            return (_context.Employees?.Any(e => e.EmployeeId == id)).GetValueOrDefault();
+            var employeeInDb = await unitOfWork.Employees.GetEmployeeByFullName(firstName, lastName);
+
+            if (employeeInDb == null)
+            {
+                return NotFound("Employee with this name doesn't exist");
+            }
+
+            await unitOfWork.Employees.Delete(employeeInDb);
+            unitOfWork.Save();
+
+            return Ok();
         }
     }
 }

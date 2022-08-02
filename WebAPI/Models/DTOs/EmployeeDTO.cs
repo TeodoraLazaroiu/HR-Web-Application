@@ -1,6 +1,6 @@
-﻿using HRAPI.Models.Entities;
+﻿using WebAPI.Models.Entities;
 
-namespace HRAPI.Models.DTOs
+namespace WebAPI.Models.DTOs
 {
     public class EmployeeDTO
     {

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace HRAPI.Models.Entities
+namespace WebAPI.Models.Entities
 {
     [Table("Job")]
     public class Job

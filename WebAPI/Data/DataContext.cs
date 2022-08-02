@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using HRAPI.Models.Entities;
+using WebAPI.Models.Entities;
 
-namespace HRAPI.Data
+namespace WebAPI.Data
 {
     public class DataContext : DbContext
     {

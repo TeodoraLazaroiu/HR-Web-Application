@@ -1,4 +1,4 @@
-﻿namespace HRAPI.Models.Entities
+﻿namespace WebAPI.Models.Entities
 {
     public class JobHistory
     {
