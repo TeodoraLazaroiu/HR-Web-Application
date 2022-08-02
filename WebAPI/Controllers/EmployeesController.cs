@@ -25,28 +25,28 @@ namespace WebAPI.Controllers
         }
 
         // GET: api/Employees/firstName/lastName
-        [HttpGet("{firstName}/{lastName}")]
-        public async Task<ActionResult<EmployeeDTO>> GetEmployeeByFullName(string firstName, string lastName)
+        [HttpGet("{id}")]
+        public async Task<ActionResult<EmployeeDTO>> GetEmployeeById(int id)
         {
-            var employee = await unitOfWork.Employees.GetEmployeeByFullName(firstName, lastName);
+            var employee = await unitOfWork.Employees.GetById(id);
 
             if (employee == null)
             {
-                return NotFound("Employee with this name doesn't exist");
+                return NotFound("Employee with this id doesn't exist");
             }
 
             return new EmployeeDTO(employee);
         }
 
         // PUT: api/Employees/5
-        [HttpPut("{firstName}/{lastName}")]
-        public async Task<IActionResult> PutEmployee(string firstName, string lastName, EmployeeDTO employee)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutEmployee(int id, EmployeeDTO employee)
         {
-            var employeeInDb = await unitOfWork.Employees.GetEmployeeByFullName(firstName, lastName);
+            var employeeInDb = await unitOfWork.Employees.GetById(id);
 
             if (employeeInDb == null)
             {
-                return BadRequest("Employee with this name doesn't exist");
+                return BadRequest("Employee with this id doesn't exist");
             }
 
             employeeInDb.FirstName = employee.FirstName;
@@ -68,13 +68,6 @@ namespace WebAPI.Controllers
        [HttpPost]
         public async Task<ActionResult<EmployeeDTO>> PostEmployee(EmployeeDTO employee)
         {
-            var employeeIdDb = await unitOfWork.Employees.GetEmployeeByFullName(employee.FirstName, employee.LastName);
-
-            if (employeeIdDb != null)
-            {
-                return BadRequest("Employee with this name already exists");
-            }
-
             var employeeToAdd = new Employee();
             employeeToAdd.FirstName = employee.FirstName;
             employeeToAdd.LastName = employee.LastName;
@@ -92,14 +85,14 @@ namespace WebAPI.Controllers
         }
 
         // DELETE: api/Employees/firstName/lastName
-        [HttpDelete("{firstName}/{lastName}")]
-        public async Task<IActionResult> DeleteEmployee(string firstName, string lastName)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteEmployee(int id)
         {
-            var employeeInDb = await unitOfWork.Employees.GetEmployeeByFullName(firstName, lastName);
+            var employeeInDb = await unitOfWork.Employees.GetById(id);
 
             if (employeeInDb == null)
             {
-                return NotFound("Employee with this name doesn't exist");
+                return NotFound("Employee with this id doesn't exist");
             }
 
             await unitOfWork.Employees.Delete(employeeInDb);

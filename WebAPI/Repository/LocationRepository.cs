@@ -5,18 +5,18 @@ using WebAPI.Repository.Interfaces;
 
 namespace WebAPI.Repository
 {
-    public class LeaveTypeRepository : GenericRepository<LeaveType>, ILeaveTypeRepository
+    public class LocationRepository : GenericRepository<Location>, ILocationRepository
     {
-        public LeaveTypeRepository(DataContext context) : base(context) { }
-        public async Task<LeaveType?> GetLeaveTypeByName(string name)
+        public LocationRepository(DataContext context) : base(context) { }
+        public async Task<Location?> GetLocationByCity(string city)
         {
-            if (string.IsNullOrEmpty(name))
+            if (city == null)
             {
                 return null;
             }
 
-            return await _context.LeaveTypes
-                .Where(a => a.LeaveName.ToLower() == name.ToLower())
+            return await _context.Locations
+                .Where(a => a.City.ToLower() == city.ToLower())
                 .FirstOrDefaultAsync();
         }
     }

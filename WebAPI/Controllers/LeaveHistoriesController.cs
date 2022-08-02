@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using WebAPI.Data;
+using WebAPI.Models.DTOs;
 using WebAPI.Models.Entities;
+using WebAPI.Repository.Interfaces;
 
 namespace WebAPI.Controllers
 {
@@ -9,111 +9,70 @@ namespace WebAPI.Controllers
     [ApiController]
     public class LeaveHistoriesController : ControllerBase
     {
-        private readonly DataContext _context;
+        private readonly IUnitOfWork unitOfWork;
 
-        public LeaveHistoriesController(DataContext context)
+        public LeaveHistoriesController(IUnitOfWork unitOfWork)
         {
-            _context = context;
+            this.unitOfWork = unitOfWork;
         }
 
         // GET: api/LeaveHistories
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<LeaveHistory>>> GetLeaveHistories()
+        public async Task<ActionResult<IEnumerable<LeaveHistoryDTO>>> GetLeaveHistories()
         {
-          if (_context.LeaveHistories == null)
-          {
-              return NotFound();
-          }
-            return await _context.LeaveHistories.ToListAsync();
+            var leaveHistories = (await unitOfWork.LeaveHistories.GetAll()).Select(a => new LeaveHistoryDTO(a)).ToList();
+            return leaveHistories;
         }
 
-        // GET: api/LeaveHistories/5
+        // GET: api/LeaveHistories/id
         [HttpGet("{id}")]
-        public async Task<ActionResult<LeaveHistory>> GetLeaveHistory(int id)
+        public async Task<ActionResult<LeaveHistoryDTO>> GetLeaveHistory(int id)
         {
-          if (_context.LeaveHistories == null)
-          {
-              return NotFound();
-          }
-            var leaveHistory = await _context.LeaveHistories.FindAsync(id);
+            var leaveHistory = await unitOfWork.LeaveHistories.GetById(id);
 
             if (leaveHistory == null)
             {
-                return NotFound();
+                return NotFound("Leave History with this id doesn't exist");
             }
 
-            return leaveHistory;
-        }
-
-        // PUT: api/LeaveHistories/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutLeaveHistory(int id, LeaveHistory leaveHistory)
-        {
-            if (id != leaveHistory.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(leaveHistory).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!LeaveHistoryExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            return new LeaveHistoryDTO(leaveHistory);
         }
 
         // POST: api/LeaveHistories
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<LeaveHistory>> PostLeaveHistory(LeaveHistory leaveHistory)
+        public async Task<ActionResult<LeaveHistoryDTO>> PostLeaveHistory(LeaveHistoryDTO leaveHistory)
         {
-          if (_context.LeaveHistories == null)
-          {
-              return Problem("Entity set 'DataContext.LeaveHistories'  is null.");
-          }
-            _context.LeaveHistories.Add(leaveHistory);
-            await _context.SaveChangesAsync();
+            var leaveHistoryToAdd = new LeaveHistory();
+            leaveHistoryToAdd.StartDate = leaveHistory.StartDate;
+            leaveHistoryToAdd.EndDate = leaveHistory.EndDate;
+            leaveHistoryToAdd.LeaveTypeId = leaveHistory.LeaveTypeId;
+            leaveHistoryToAdd.EmployeeId = leaveHistory.EmployeeId;
+            leaveHistoryToAdd.Status = leaveHistory.Status;
 
-            return CreatedAtAction("GetLeaveHistory", new { id = leaveHistory.Id }, leaveHistory);
+            await unitOfWork.LeaveHistories.Create(leaveHistoryToAdd);
+            int numberOfDays = unitOfWork.LeaveHistories.GetNumberOfDays(leaveHistoryToAdd);
+
+
+            unitOfWork.Save();
+
+            return Ok();
         }
 
-        // DELETE: api/LeaveHistories/5
+        // DELETE: api/LeaveHistories/id
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteLeaveHistory(int id)
         {
-            if (_context.LeaveHistories == null)
+            var leaveHistoryInDb = await unitOfWork.LeaveHistories.GetById(id);
+
+            if (leaveHistoryInDb == null)
             {
-                return NotFound();
-            }
-            var leaveHistory = await _context.LeaveHistories.FindAsync(id);
-            if (leaveHistory == null)
-            {
-                return NotFound();
+                return NotFound("Leave History with this id doesn't exist");
             }
 
-            _context.LeaveHistories.Remove(leaveHistory);
-            await _context.SaveChangesAsync();
+            await unitOfWork.LeaveHistories.Delete(leaveHistoryInDb);
+            unitOfWork.Save();
 
-            return NoContent();
-        }
-
-        private bool LeaveHistoryExists(int id)
-        {
-            return (_context.LeaveHistories?.Any(e => e.Id == id)).GetValueOrDefault();
+            return Ok();
         }
     }
 }

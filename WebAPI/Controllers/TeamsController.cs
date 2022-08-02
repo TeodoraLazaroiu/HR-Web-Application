@@ -24,29 +24,29 @@ namespace WebAPI.Controllers
             return teams;
         }
 
-        // GET: api/Teams/name
-        [HttpGet("{name}")]
-        public async Task<ActionResult<TeamDTO>> GetTeamByName(string name)
+        // GET: api/Teams/id
+        [HttpGet("{id}")]
+        public async Task<ActionResult<TeamDTO>> GetTeamByName(int id)
         {
-            var team = await unitOfWork.Teams.GetTeamByName(name);
+            var team = await unitOfWork.Teams.GetById(id);
 
             if (team == null)
             {
-                return NotFound("Team with this name doesn't exist");
+                return NotFound("Team with this id doesn't exist");
             }
 
             return new TeamDTO(team);
         }
 
-        // PUT: api/Teams/name
-        [HttpPut("{name}")]
-        public async Task<IActionResult> PutTeam(string name, TeamDTO team)
+        // PUT: api/Teams/id
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutTeam(int id, TeamDTO team)
         {
-            var teamInDb = await unitOfWork.Teams.GetTeamByName(name);
+            var teamInDb = await unitOfWork.Teams.GetById(id);
 
             if (teamInDb == null)
             {
-                return NotFound("Team with this name doesn't exist");
+                return NotFound("Team with this id doesn't exist");
             }
 
             teamInDb.TeamName = team.TeamName;
@@ -63,13 +63,6 @@ namespace WebAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<TeamDTO>> PostTeam(TeamDTO team)
         {
-            var teamInDb = await unitOfWork.Teams.GetTeamByName(team.TeamName);
-
-            if (teamInDb != null)
-            {
-                return NotFound("Team with this name already exist");
-            }
-
             var teamToAdd = new Team();
             teamToAdd.TeamName = team.TeamName;
             teamToAdd.TeamLeadId = team.TeamLeadId;
@@ -82,14 +75,14 @@ namespace WebAPI.Controllers
         }
 
         // DELETE: api/Teams/name
-        [HttpDelete("{name}")]
-        public async Task<IActionResult> DeleteTeam(string name)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteTeam(int id)
         {
-            var teamInDb = await unitOfWork.Teams.GetTeamByName(name);
+            var teamInDb = await unitOfWork.Teams.GetById(id);
 
             if (teamInDb == null)
             {
-                return NotFound("Team with this name doesn't exist");
+                return NotFound("Team with this id doesn't exist");
             }
 
             await unitOfWork.Teams.Delete(teamInDb);

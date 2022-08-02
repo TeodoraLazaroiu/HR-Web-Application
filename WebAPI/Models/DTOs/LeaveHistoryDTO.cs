@@ -4,6 +4,7 @@ namespace WebAPI.Models.DTOs
 {
     public class LeaveHistoryDTO
     {
+        public int Id { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public int? LeaveTypeId { get; set; }
@@ -12,6 +13,7 @@ namespace WebAPI.Models.DTOs
 
         public LeaveHistoryDTO(LeaveHistory leaveHistory)
         {
+            this.Id = leaveHistory.Id;
             this.StartDate = leaveHistory.StartDate;
             this.EndDate = leaveHistory.EndDate;
             this.LeaveTypeId = leaveHistory.LeaveTypeId;

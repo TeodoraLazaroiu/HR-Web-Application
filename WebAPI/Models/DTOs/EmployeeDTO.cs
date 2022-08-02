@@ -4,6 +4,7 @@ namespace WebAPI.Models.DTOs
 {
     public class EmployeeDTO
     {
+        public int EmployeeId { get; set; }
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
         public string EmailAddress { get; set; } = string.Empty;
@@ -15,6 +16,7 @@ namespace WebAPI.Models.DTOs
 
         public EmployeeDTO(Employee employee)
         {
+            EmployeeId = employee.EmployeeId;
             FirstName = employee.FirstName;
             LastName = employee.LastName;
             EmailAddress = employee.EmailAddress;

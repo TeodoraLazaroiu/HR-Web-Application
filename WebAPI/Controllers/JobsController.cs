@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.Data;
+using WebAPI.Models.DTOs;
 using WebAPI.Models.Entities;
+using WebAPI.Repository.Interfaces;
 
 namespace WebAPI.Controllers
 {
@@ -9,111 +11,86 @@ namespace WebAPI.Controllers
     [ApiController]
     public class JobsController : ControllerBase
     {
-        private readonly DataContext _context;
+        private readonly IUnitOfWork unitOfWork;
 
-        public JobsController(DataContext context)
+        public JobsController(IUnitOfWork unitOfWork)
         {
-            _context = context;
+            this.unitOfWork = unitOfWork;
         }
 
         // GET: api/Jobs
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Job>>> GetJobs()
+        public async Task<ActionResult<IEnumerable<JobDTO>>> GetJobs()
         {
-          if (_context.Jobs == null)
-          {
-              return NotFound();
-          }
-            return await _context.Jobs.ToListAsync();
+            var jobs = (await unitOfWork.Jobs.GetAll()).Select(a => new JobDTO(a)).ToList();
+            return jobs;
         }
 
-        // GET: api/Jobs/5
+        // GET: api/Jobs/id
         [HttpGet("{id}")]
-        public async Task<ActionResult<Job>> GetJob(int id)
+        public async Task<ActionResult<JobDTO>> GetJob(int id)
         {
-          if (_context.Jobs == null)
-          {
-              return NotFound();
-          }
-            var job = await _context.Jobs.FindAsync(id);
+            var job = await unitOfWork.Jobs.GetById(id);
 
             if (job == null)
             {
-                return NotFound();
+                return NotFound("Job with this id doesn't exist");
             }
 
-            return job;
+            return new JobDTO(job);
         }
 
-        // PUT: api/Jobs/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        // PUT: api/Jobs/id
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutJob(int id, Job job)
+        public async Task<IActionResult> PutJob(int id, JobDTO job)
         {
-            if (id != job.JobId)
+            var jobInDb = await unitOfWork.Jobs.GetById(id);
+
+            if (jobInDb == null)
             {
-                return BadRequest();
+                return NotFound("Job with this id doesn't exist");
             }
 
-            _context.Entry(job).State = EntityState.Modified;
+            jobInDb.JobTitle = job.JobTitle;
+            jobInDb.MinSalary = job.MinSalary;
+            jobInDb.MaxSalary = job.MaxSalary;
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!JobExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            await unitOfWork.Jobs.Update(jobInDb);
+            unitOfWork.Save();
 
-            return NoContent();
+            return Ok();
         }
 
         // POST: api/Jobs
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Job>> PostJob(Job job)
         {
-          if (_context.Jobs == null)
-          {
-              return Problem("Entity set 'DataContext.Jobs'  is null.");
-          }
-            _context.Jobs.Add(job);
-            await _context.SaveChangesAsync();
+            var jobToAdd = new Job();
+            jobToAdd.JobTitle = job.JobTitle;
+            jobToAdd.MinSalary = job.MinSalary;
+            jobToAdd.MaxSalary = job.MaxSalary;
 
-            return CreatedAtAction("GetJob", new { id = job.JobId }, job);
+            await unitOfWork.Jobs.Create(jobToAdd);
+            unitOfWork.Save();
+
+            return Ok();
         }
 
-        // DELETE: api/Jobs/5
+        // DELETE: api/Jobs/id
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteJob(int id)
         {
-            if (_context.Jobs == null)
+            var jobInDb = await unitOfWork.Jobs.GetById(id);
+
+            if (jobInDb == null)
             {
-                return NotFound();
-            }
-            var job = await _context.Jobs.FindAsync(id);
-            if (job == null)
-            {
-                return NotFound();
+                return NotFound("Job with this id doesn't exist");
             }
 
-            _context.Jobs.Remove(job);
-            await _context.SaveChangesAsync();
+            await unitOfWork.Jobs.Delete(jobInDb);
+            unitOfWork.Save();
 
-            return NoContent();
-        }
-
-        private bool JobExists(int id)
-        {
-            return (_context.Jobs?.Any(e => e.JobId == id)).GetValueOrDefault();
+            return Ok();
         }
     }
 }

@@ -24,29 +24,29 @@ namespace WebAPI.Controllers
             return leaveTypes;
         }
 
-        // GET: api/LeaveTypes/name
-        [HttpGet("{name}")]
-        public async Task<ActionResult<LeaveTypeDTO>> GetLeaveType(string name)
+        // GET: api/LeaveTypes/id
+        [HttpGet("{id}")]
+        public async Task<ActionResult<LeaveTypeDTO>> GetLeaveType(int id)
         {
-            var leaveType = await unitOfWork.LeaveTypes.GetLeaveTypeByName(name);
+            var leaveType = await unitOfWork.LeaveTypes.GetById(id);
 
             if (leaveType == null)
             {
-                return NotFound("Leave Type with this name doesn't exist");
+                return NotFound("Leave Type with this id doesn't exist");
             }
 
             return new LeaveTypeDTO(leaveType);
         }
 
-        // PUT: api/LeaveTypes/city
-        [HttpPut("{name}")]
-        public async Task<IActionResult> PutLeaveType(string name, LeaveTypeDTO leaveType)
+        // PUT: api/LeaveTypes/id
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutLeaveType(int id, LeaveTypeDTO leaveType)
         {
-            var leaveTypeInDb = await unitOfWork.LeaveTypes.GetLeaveTypeByName(name);
+            var leaveTypeInDb = await unitOfWork.LeaveTypes.GetById(id);
 
             if (leaveTypeInDb == null)
             {
-                return NotFound("Leave Type with this name doesn't exist");
+                return NotFound("Leave Type with this id doesn't exist");
             }
 
             leaveTypeInDb.LeaveName = leaveType.LeaveName;
@@ -63,18 +63,10 @@ namespace WebAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<LeaveTypeDTO>> PostLeaveType(LeaveTypeDTO leaveType)
         {
-            var leaveTypeInDb = await unitOfWork.LeaveTypes.GetLeaveTypeByName(leaveType.LeaveName);
-
-            if (leaveTypeInDb != null)
-            {
-                return NotFound("Leave Type with this name already exist");
-            }
-
             var leaveTypeToAdd = new LeaveType();
             leaveTypeToAdd.LeaveName = leaveType.LeaveName;
             leaveTypeToAdd.NumberOfDays = leaveType.NumberOfDays;
             leaveTypeToAdd.Description = leaveType.Description;
-
 
             await unitOfWork.LeaveTypes.Create(leaveTypeToAdd);
             unitOfWork.Save();
@@ -82,15 +74,15 @@ namespace WebAPI.Controllers
             return Ok();
         }
 
-        // DELETE: api/LeaveTypes/name
-        [HttpDelete("{name}")]
-        public async Task<IActionResult> DeleteLeaveType(string name)
+        // DELETE: api/LeaveTypes/id
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteLeaveType(int id)
         {
-            var leaveTypeInDb = await unitOfWork.LeaveTypes.GetLeaveTypeByName(name);
+            var leaveTypeInDb = await unitOfWork.LeaveTypes.GetById(id);
 
             if (leaveTypeInDb == null)
             {
-                return NotFound("Leave Type with this name doesn't exist");
+                return NotFound("Leave Type with this id doesn't exist");
             }
 
             await unitOfWork.LeaveTypes.Delete(leaveTypeInDb);

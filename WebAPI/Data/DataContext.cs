@@ -10,6 +10,7 @@ namespace WebAPI.Data
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
         public DbSet<Employee> Employees { get; set; } = null!;
         public DbSet<Job> Jobs { get; set; } = null!;
+        public DbSet<JobHistory> JobHistories { get; set; } = null!;
         public DbSet<LeaveBalance> LeaveBalances { get; set; } = null!;
         public DbSet<LeaveHistory> LeaveHistories { get; set; } = null!;
         public DbSet<LeaveType> LeaveTypes { get; set; } = null!;

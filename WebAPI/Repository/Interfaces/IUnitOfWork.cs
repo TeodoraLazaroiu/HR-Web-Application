@@ -6,6 +6,9 @@
         ITeamRepository Teams { get; }
         ILocationRepository Locations { get; }
         ILeaveTypeRepository LeaveTypes { get; }
+        IJobRepository Jobs { get; }
+        IJobHistoryRepository JobHistories { get; }
+        ILeaveHistoryRepository LeaveHistories { get; }
         int Save();
     }
 }

@@ -13,6 +13,9 @@ namespace WebAPI.Repository
             Teams = new TeamRepository(this.context);
             Locations = new LocationRepository(this.context);
             LeaveTypes = new LeaveTypeRepository(this.context);
+            Jobs = new JobRepository(this.context);
+            JobHistories =  new JobHistoryRepository(this.context);
+            LeaveHistories = new LeaveHistoryRepository(this.context);
         }
         public IEmployeesRepository Employees
         {
@@ -30,6 +33,21 @@ namespace WebAPI.Repository
             private set;
         }
         public ILeaveTypeRepository LeaveTypes
+        {
+            get;
+            private set;
+        }
+        public IJobRepository Jobs
+        {
+            get;
+            private set;
+        }
+        public IJobHistoryRepository JobHistories
+        {
+            get;
+            private set;
+        }
+        public ILeaveHistoryRepository LeaveHistories
         {
             get;
             private set;
