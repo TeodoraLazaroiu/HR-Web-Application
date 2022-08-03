@@ -16,6 +16,7 @@ namespace WebAPI.Repository
             Jobs = new JobRepository(this.context);
             JobHistories =  new JobHistoryRepository(this.context);
             LeaveHistories = new LeaveHistoryRepository(this.context);
+            LeaveBalances = new LeaveBalanceRepository(this.context);
         }
         public IEmployeesRepository Employees
         {
@@ -48,6 +49,11 @@ namespace WebAPI.Repository
             private set;
         }
         public ILeaveHistoryRepository LeaveHistories
+        {
+            get;
+            private set;
+        }
+        public ILeaveBalanceRepository LeaveBalances
         {
             get;
             private set;

@@ -12,7 +12,7 @@ namespace WebAPI.Models.Entities
         public DateTime EndDate { get; set; }
         public int? LeaveTypeId { get; set; }
         public LeaveType? LeaveType { get; set; }
-        public int? EmployeeId { get; set; }
+        public int EmployeeId { get; set; }
         public Employee? Employee { get; set; }
         public string Status { get; set; } = string.Empty;
     }

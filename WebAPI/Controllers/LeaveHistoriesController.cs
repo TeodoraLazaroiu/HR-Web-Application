@@ -38,7 +38,43 @@ namespace WebAPI.Controllers
             return new LeaveHistoryDTO(leaveHistory);
         }
 
+        // PUT: api/LeaveTypes/id
+        // for HR to accept or decline the leave
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutLeaveHistory(int id, LeaveHistoryDTO leaveHistory)
+        {
+            var leaveHistoryInDb = await unitOfWork.LeaveHistories.GetById(id);
+
+            if (leaveHistoryInDb == null)
+            {
+                return NotFound("Leave History with this id doesn't exist");
+            }
+
+            leaveHistoryInDb.Status = leaveHistory.Status;
+            await unitOfWork.LeaveHistories.Update(leaveHistoryInDb);
+
+            // updating employee's balance in status is ACCEPTED
+            if (leaveHistory.Status.ToUpper() == "ACCEPTED")
+            {
+                int numberOfDays = unitOfWork.LeaveHistories.GetNumberOfDays(leaveHistoryInDb);
+                var balance = await unitOfWork.LeaveBalances.GetById(leaveHistory.EmployeeId);
+
+                if (balance == null)
+                {
+                    return BadRequest("Balance doesn't exist for this employee");
+                }
+
+                balance = unitOfWork.LeaveBalances.ReduceBalance(balance, numberOfDays);
+                await unitOfWork.LeaveBalances.Update(balance);
+            }
+
+            unitOfWork.Save();
+
+            return Ok();
+        }
+
         // POST: api/LeaveHistories
+        // for employees to request a leave
         [HttpPost]
         public async Task<ActionResult<LeaveHistoryDTO>> PostLeaveHistory(LeaveHistoryDTO leaveHistory)
         {
@@ -47,12 +83,9 @@ namespace WebAPI.Controllers
             leaveHistoryToAdd.EndDate = leaveHistory.EndDate;
             leaveHistoryToAdd.LeaveTypeId = leaveHistory.LeaveTypeId;
             leaveHistoryToAdd.EmployeeId = leaveHistory.EmployeeId;
-            leaveHistoryToAdd.Status = leaveHistory.Status;
+            leaveHistoryToAdd.Status = "PENDING";
 
             await unitOfWork.LeaveHistories.Create(leaveHistoryToAdd);
-            int numberOfDays = unitOfWork.LeaveHistories.GetNumberOfDays(leaveHistoryToAdd);
-
-
             unitOfWork.Save();
 
             return Ok();
@@ -70,6 +103,22 @@ namespace WebAPI.Controllers
             }
 
             await unitOfWork.LeaveHistories.Delete(leaveHistoryInDb);
+
+            // updating employee's balance if it was already accepted
+            if (leaveHistoryInDb.Status.ToUpper() == "ACCEPTED")
+            {
+                int numberOfDays = unitOfWork.LeaveHistories.GetNumberOfDays(leaveHistoryInDb);
+                var balance = await unitOfWork.LeaveBalances.GetById(leaveHistoryInDb.EmployeeId);
+
+                if (balance == null)
+                {
+                    return BadRequest("Balance doesn't exist for this employee");
+                }
+
+                balance = unitOfWork.LeaveBalances.IncreaseBalance(balance, numberOfDays);
+                await unitOfWork.LeaveBalances.Update(balance);
+            }
+
             unitOfWork.Save();
 
             return Ok();

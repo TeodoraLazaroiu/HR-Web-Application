@@ -9,6 +9,7 @@
         IJobRepository Jobs { get; }
         IJobHistoryRepository JobHistories { get; }
         ILeaveHistoryRepository LeaveHistories { get; }
+        ILeaveBalanceRepository LeaveBalances { get; }
         int Save();
     }
 }
