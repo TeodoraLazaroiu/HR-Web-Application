@@ -15,9 +15,9 @@ web application development project using ASP.NET 6
 - [ ] Register + Login + Implementare Guard. (1p)
  
 2. Backend (4p) :
-- [ ] 3 Controllere (minim); Fiecare Metoda Crud, REST cu date din baza de date. (1p)
+- [X] 3 Controllere (minim); Fiecare Metoda Crud, REST cu date din baza de date. (1p)
 - [ ] Cel puțin 1 relație între tabele din fiecare fel (One to One, Many to Many, One to Many); Folosirea metodelor din Linq: GroupBy, Where, etc; Folosirea Join si Include. (1p)
 - [ ] Autentificare + Roluri; Autorizare pe endpointuri în funcție de Roluri; Cel putin 2 Roluri: Admin, User. (1p)
-- [ ] Sa se foloseasca repository pattern/unit of work. (1p)
+- [X] Sa se foloseasca repository pattern/unit of work. (1p)
 
 3. Functionalitati Extra de exemplu: integrare Facebook, trimitere de mailuri etc. (1p)
