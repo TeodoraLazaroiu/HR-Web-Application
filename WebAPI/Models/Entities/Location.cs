@@ -11,7 +11,7 @@ namespace WebAPI.Models.Entities
         public string City { get; set; } = string.Empty;
         public string PostalCode { get; set; } = string.Empty;
         public string Street { get; set; } = string.Empty;
-        public int Number { get; set; }
+        public int Number { get; set; } = 0;
         public string Country { get; set; } = string.Empty;
         public IEnumerable<Team> Teams { get; set; } = new HashSet<Team>();
     }

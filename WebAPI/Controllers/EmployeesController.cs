@@ -52,10 +52,8 @@ namespace WebAPI.Controllers
             employeeInDb.FirstName = employee.FirstName;
             employeeInDb.LastName = employee.LastName;
             employeeInDb.EmailAddress = employee.EmailAddress;
-            employeeInDb.BirthDate = employee.BirthDate;
             employeeInDb.TeamId = employee.TeamId;
             employeeInDb.CurrentJobId = employee.CurrentJobId;
-            employeeInDb.HireDate = employee.HireDate;
             employeeInDb.Salary = employee.Salary;
 
             await unitOfWork.Employees.Update(employeeInDb);
@@ -68,17 +66,23 @@ namespace WebAPI.Controllers
        [HttpPost]
         public async Task<ActionResult<EmployeeDTO>> PostEmployee(EmployeeDTO employee)
         {
+
             var employeeToAdd = new Employee();
+
             employeeToAdd.FirstName = employee.FirstName;
             employeeToAdd.LastName = employee.LastName;
             employeeToAdd.EmailAddress = employee.EmailAddress;
-            employeeToAdd.BirthDate = employee.BirthDate;
             employeeToAdd.TeamId = employee.TeamId;
             employeeToAdd.CurrentJobId = employee.CurrentJobId;
-            employeeToAdd.HireDate = employee.HireDate;
             employeeToAdd.Salary = employee.Salary;
-
             await unitOfWork.Employees.Create(employeeToAdd);
+
+            var leaveBalance = new LeaveBalance(employeeToAdd.EmployeeId);
+            await unitOfWork.LeaveBalances.Create(leaveBalance);
+
+            var jobHistory = new JobHistory(employeeToAdd.EmployeeId, employeeToAdd.CurrentJobId);
+            await unitOfWork.JobHistories.Create(jobHistory);
+
             unitOfWork.Save();
 
             return Ok();
@@ -96,6 +100,15 @@ namespace WebAPI.Controllers
             }
 
             await unitOfWork.Employees.Delete(employeeInDb);
+
+            var leaveBalanceInDb = await unitOfWork.LeaveBalances.GetById(id);
+
+            if (leaveBalanceInDb == null)
+            {
+                return NotFound("Leave Balance with this id doesn't exist");
+            }
+
+            await unitOfWork.LeaveBalances.Delete(leaveBalanceInDb);
             unitOfWork.Save();
 
             return Ok();

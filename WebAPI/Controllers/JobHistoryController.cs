@@ -38,20 +38,6 @@ namespace WebAPI.Controllers
             return new JobHistoryDTO(jobHistory);
         }
 
-        // POST: api/JobHistories
-        [HttpPost]
-        public async Task<ActionResult<JobHistoryDTO>> PostJob(JobHistoryDTO jobHistory)
-        {
-            var jobHistoryToAdd = new JobHistory();
-            jobHistoryToAdd.EmployeeId = jobHistory.EmployeeId;
-            jobHistoryToAdd.JobId = jobHistory.JobId;
-
-            await unitOfWork.JobHistories.Create(jobHistoryToAdd);
-            unitOfWork.Save();
-
-            return Ok();
-        }
-
         // DELETE: api/JobHistories/eid/jid
         [HttpDelete("{eid}/{jid}")]
         public async Task<IActionResult> DeleteJob(int EmployeeId, int JobId)

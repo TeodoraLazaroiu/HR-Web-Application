@@ -16,5 +16,10 @@ namespace WebAPI.Models.DTOs
             TeamLeadId = team.TeamLeadId;
             LocationId = team.LocationId;
         }
+
+        public TeamDTO()
+        {
+
+        }
     }
 }

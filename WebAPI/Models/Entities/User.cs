@@ -7,8 +7,8 @@ namespace WebAPI.Models.Entities
     public class User
     {
         [Key]
-        public int Id { get; set; }
-        public Employee Employee { get; set; } = new Employee();
+        public int UserId { get; set; }
+        public Employee? Employee { get; set; }
         public string EmailAddress { get; set; } = string.Empty;
         public string HashedPassword { get; set; } = string.Empty;
         public string PasswordSalt { get; set; } = string.Empty;

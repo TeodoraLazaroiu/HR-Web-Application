@@ -20,5 +20,10 @@ namespace WebAPI.Models.DTOs
             this.EmployeeId = leaveHistory.EmployeeId;
             this.Status = leaveHistory.Status;
         }
+
+        public LeaveHistoryDTO()
+        {
+
+        }
     }
 }

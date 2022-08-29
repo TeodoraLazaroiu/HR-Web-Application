@@ -16,5 +16,10 @@ namespace WebAPI.Models.DTOs
             this.NumberOfDays = leaveType.NumberOfDays;
             this.Description = leaveType.Description;
         }
+
+        public LeaveTypeDTO()
+        {
+
+        }
     }
 }

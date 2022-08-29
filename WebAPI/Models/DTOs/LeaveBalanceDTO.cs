@@ -11,10 +11,15 @@ namespace WebAPI.Models.DTOs
 
         public LeaveBalanceDTO(LeaveBalance leaveBalance)
         {
-            this.Id = leaveBalance.Id;
+            this.Id = leaveBalance.LeaveBalanceId;
             this.DaysTotal = leaveBalance.DaysTotal;
             this.DaysRemaining = leaveBalance.DaysRemaining;
             this.DaysTaken = leaveBalance.DaysTaken;
+        }
+
+        public LeaveBalanceDTO()
+        {
+
         }
     }
 }

@@ -7,11 +7,20 @@ namespace WebAPI.Models.Entities
     public class LeaveBalance
     {
         [Key]
-        [ForeignKey("Employee")]
-        public int Id { get; set; }
-        public Employee Employee { get; set; } = new Employee();
+        public int LeaveBalanceId { get; set; }
+        public Employee? Employee { get; set; }
         public int DaysTotal { get; set; } = 20;
         public int DaysRemaining { get; set; } = 20;
         public int DaysTaken { get; set; } = 0;
+
+        public LeaveBalance(int employeeId)
+        {
+            this.LeaveBalanceId = employeeId;
+        }
+
+        public LeaveBalance()
+        {
+
+        }
     }
 }

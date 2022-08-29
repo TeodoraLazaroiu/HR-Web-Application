@@ -52,8 +52,7 @@ namespace WebAPI.Controllers
             }
 
             jobInDb.JobTitle = job.JobTitle;
-            jobInDb.MinSalary = job.MinSalary;
-            jobInDb.MaxSalary = job.MaxSalary;
+            jobInDb.JobDescription = job.JobDescription;
 
             await unitOfWork.Jobs.Update(jobInDb);
             unitOfWork.Save();
@@ -63,12 +62,11 @@ namespace WebAPI.Controllers
 
         // POST: api/Jobs
         [HttpPost]
-        public async Task<ActionResult<Job>> PostJob(Job job)
+        public async Task<ActionResult<JobDTO>> PostJob(JobDTO job)
         {
             var jobToAdd = new Job();
             jobToAdd.JobTitle = job.JobTitle;
-            jobToAdd.MinSalary = job.MinSalary;
-            jobToAdd.MaxSalary = job.MaxSalary;
+            jobToAdd.JobDescription = job.JobDescription;
 
             await unitOfWork.Jobs.Create(jobToAdd);
             unitOfWork.Save();

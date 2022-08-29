@@ -9,8 +9,7 @@ namespace WebAPI.Models.Entities
         [Key]
         public int JobId { get; set; }
         public string JobTitle { get; set; } = string.Empty;
-        public int MinSalary { get; set; }
-        public int MaxSalary { get; set; }
+        public string JobDescription { get; set; } = string.Empty;
         public IEnumerable<JobHistory> JobHistories { get; set; } = new HashSet<JobHistory>();
     }
 }

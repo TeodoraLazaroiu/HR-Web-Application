@@ -20,5 +20,10 @@ namespace WebAPI.Models.DTOs
             this.Number = location.Number;
             this.Country = location.Country;
         }
+
+        public LocationDTO()
+        {
+
+        }
     }
 }

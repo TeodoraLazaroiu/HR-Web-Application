@@ -12,5 +12,10 @@ namespace WebAPI.Models.DTOs
             this.JobId = jobHistory.JobId;
             this.EmployeeId = jobHistory.EmployeeId;
         }
+
+        public JobHistoryDTO()
+        {
+
+        }
     }
 }
