@@ -9,18 +9,18 @@ namespace WebAPI.Controllers
     [ApiController]
     public class LocationsController : ControllerBase
     {
-        private readonly IUnitOfWork unitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
 
         public LocationsController(IUnitOfWork unitOfWork)
         {
-            this.unitOfWork = unitOfWork;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: api/Locations
         [HttpGet]
         public async Task<ActionResult<IEnumerable<LocationDTO>>> GetLocations()
         {
-            var locations = (await unitOfWork.Locations
+            var locations = (await _unitOfWork.Locations
                 .GetAll()).Select(a => new LocationDTO(a)).ToList();
             return locations;
         }
@@ -29,7 +29,7 @@ namespace WebAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<LocationDTO>> GetLocation(int id)
         {
-            var location = await unitOfWork.Locations.GetById(id);
+            var location = await _unitOfWork.Locations.GetById(id);
 
             if (location == null)
             {
@@ -43,7 +43,7 @@ namespace WebAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutLocation(int id, LocationDTO location)
         {
-            var locationInDb = await unitOfWork.Locations.GetById(id);
+            var locationInDb = await _unitOfWork.Locations.GetById(id);
 
             if (locationInDb == null)
             {
@@ -56,8 +56,8 @@ namespace WebAPI.Controllers
             locationInDb.Street = location.Street;
             locationInDb.Number = location.Number;
 
-            await unitOfWork.Locations.Update(locationInDb);
-            unitOfWork.Save();
+            await _unitOfWork.Locations.Update(locationInDb);
+            _unitOfWork.Save();
 
             return Ok();
         }
@@ -68,8 +68,8 @@ namespace WebAPI.Controllers
         {
             var locationToAdd = new Location(location);
 
-            await unitOfWork.Locations.Create(locationToAdd);
-            unitOfWork.Save();
+            await _unitOfWork.Locations.Create(locationToAdd);
+            _unitOfWork.Save();
 
             return Ok();
         }
@@ -78,15 +78,15 @@ namespace WebAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteLocation(int id)
         {
-            var locationInDb = await unitOfWork.Locations.GetById(id);
+            var locationInDb = await _unitOfWork.Locations.GetById(id);
 
             if (locationInDb == null)
             {
                 return NotFound("Location with this id doesn't exist");
             }
 
-            await unitOfWork.Locations.Delete(locationInDb);
-            unitOfWork.Save();
+            await _unitOfWork.Locations.Delete(locationInDb);
+            _unitOfWork.Save();
 
             return Ok();
         }

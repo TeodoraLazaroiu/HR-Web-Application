@@ -4,6 +4,7 @@ using WebAPI.Models;
 using WebAPI.Models.DTOs;
 using WebAPI.Models.Entities;
 using WebAPI.Repository.Interfaces;
+using WebAPI.Services;
 
 namespace API.Controllers
 {
@@ -12,11 +13,13 @@ namespace API.Controllers
 	[ApiController]
 	public class UsersController : ControllerBase
 	{
-		private readonly IUnitOfWork unitOfWork;
+		private readonly IUnitOfWork _unitOfWork;
+		private readonly IAuthenticationService _service;
 
-		public UsersController(IUnitOfWork unitOfWork)
+		public UsersController(IUnitOfWork unitOfWork, IAuthenticationService service)
 		{
-			this.unitOfWork = unitOfWork;
+			_unitOfWork = unitOfWork;
+			_service = service;
 		}
 
 		[HttpPost]
@@ -26,7 +29,7 @@ namespace API.Controllers
 			Token? token;
 			try
 			{
-				token = await unitOfWork.Users.GetTokenForUser(user);
+				token = await _service.Authenticate(user);
 			}
 			catch (Exception e)
 			{
@@ -49,8 +52,8 @@ namespace API.Controllers
 
 			try
 			{
-				newUser = await unitOfWork.Users.GetRegisteredUser(user);
-				await unitOfWork.Users.Create(newUser);
+				newUser = await _service.Register(user);
+				await _unitOfWork.Users.Create(newUser);
 			}
 			catch (Exception e)
 			{

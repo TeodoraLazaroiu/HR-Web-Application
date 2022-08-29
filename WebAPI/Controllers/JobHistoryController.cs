@@ -9,18 +9,18 @@ namespace WebAPI.Controllers
     [ApiController]
     public class JobHistoryController : ControllerBase
     {
-        private readonly IUnitOfWork unitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
 
         public JobHistoryController(IUnitOfWork unitOfWork)
         {
-            this.unitOfWork = unitOfWork;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: api/JobHistories
         [HttpGet]
         public async Task<ActionResult<IEnumerable<JobHistoryDTO>>> GetJobHistories()
         {
-            var jobHistories = (await unitOfWork.JobHistories
+            var jobHistories = (await _unitOfWork.JobHistories
                 .GetAll()).Select(a => new JobHistoryDTO(a)).ToList();
             return jobHistories;
         }
@@ -29,7 +29,7 @@ namespace WebAPI.Controllers
         [HttpGet("{eid}/{jid}")]
         public async Task<ActionResult<JobHistoryDTO>> GetJob(int eid, int jid)
         {
-            var jobHistory = await unitOfWork.JobHistories.GetByBothIds(eid, jid);
+            var jobHistory = await _unitOfWork.JobHistories.GetByBothIds(eid, jid);
 
             if (jobHistory == null)
             {
@@ -43,7 +43,7 @@ namespace WebAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutJobHistory(int id, JobHistoryDTO job)
         {
-            var jobHistoryInDb = await unitOfWork.JobHistories.GetById(id);
+            var jobHistoryInDb = await _unitOfWork.JobHistories.GetById(id);
 
             if (jobHistoryInDb == null)
             {
@@ -53,8 +53,8 @@ namespace WebAPI.Controllers
             jobHistoryInDb.EmployeeId = job.EmployeeId;
             jobHistoryInDb.JobId = job.JobId;
 
-            await unitOfWork.JobHistories.Update(jobHistoryInDb);
-            unitOfWork.Save();
+            await _unitOfWork.JobHistories.Update(jobHistoryInDb);
+            _unitOfWork.Save();
 
             return Ok();
         }
@@ -65,8 +65,8 @@ namespace WebAPI.Controllers
         {
             var jobHistoryToAdd = new JobHistory(jobHistory);
 
-            await unitOfWork.JobHistories.Create(jobHistoryToAdd);
-            unitOfWork.Save();
+            await _unitOfWork.JobHistories.Create(jobHistoryToAdd);
+            _unitOfWork.Save();
 
             return Ok();
         }
@@ -75,15 +75,15 @@ namespace WebAPI.Controllers
         [HttpDelete("{eid}/{jid}")]
         public async Task<IActionResult> DeleteJob(int eid, int jid)
         {
-            var jobHistoryInDb = await unitOfWork.JobHistories.GetByBothIds(eid, jid);
+            var jobHistoryInDb = await _unitOfWork.JobHistories.GetByBothIds(eid, jid);
 
             if (jobHistoryInDb == null)
             {
                 return NotFound("Job History with those ids doesn't exist");
             }
 
-            await unitOfWork.JobHistories.Delete(jobHistoryInDb);
-            unitOfWork.Save();
+            await _unitOfWork.JobHistories.Delete(jobHistoryInDb);
+            _unitOfWork.Save();
 
             return Ok();
         }

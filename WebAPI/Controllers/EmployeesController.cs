@@ -9,27 +9,27 @@ namespace WebAPI.Controllers
     [ApiController]
     public class EmployeesController : ControllerBase
     {
-        private readonly IUnitOfWork unitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
 
         public EmployeesController(IUnitOfWork unitOfWork)
         {
-            this.unitOfWork = unitOfWork;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: api/Employees
         [HttpGet]
         public async Task<ActionResult<IEnumerable<EmployeeDTO>>> GetEmployees()
         {
-            var employees = (await unitOfWork.Employees
+            var employees = (await _unitOfWork.Employees
                 .GetAll()).Select(a => new EmployeeDTO(a)).ToList();
             return employees;
         }
 
-        // GET: api/Employees/firstName/lastName
+        // GET: api/Employees/id
         [HttpGet("{id}")]
         public async Task<ActionResult<EmployeeDTO>> GetEmployeeById(int id)
         {
-            var employee = await unitOfWork.Employees.GetById(id);
+            var employee = await _unitOfWork.Employees.GetById(id);
 
             if (employee == null)
             {
@@ -43,7 +43,7 @@ namespace WebAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutEmployee(int id, EmployeeDTO employee)
         {
-            var employeeInDb = await unitOfWork.Employees.GetById(id);
+            var employeeInDb = await _unitOfWork.Employees.GetById(id);
 
             if (employeeInDb == null)
             {
@@ -57,8 +57,8 @@ namespace WebAPI.Controllers
             employeeInDb.CurrentJobId = employee.CurrentJobId;
             employeeInDb.Salary = employee.Salary;
 
-            await unitOfWork.Employees.Update(employeeInDb);
-            unitOfWork.Save();
+            await _unitOfWork.Employees.Update(employeeInDb);
+            _unitOfWork.Save();
 
             return Ok();
         }
@@ -70,8 +70,8 @@ namespace WebAPI.Controllers
 
             var employeeToAdd = new Employee(employee);
 
-            await unitOfWork.Employees.Create(employeeToAdd);
-            unitOfWork.Save();
+            await _unitOfWork.Employees.Create(employeeToAdd);
+            _unitOfWork.Save();
 
             return Ok();
         }
@@ -80,15 +80,15 @@ namespace WebAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEmployee(int id)
         {
-            var employeeInDb = await unitOfWork.Employees.GetById(id);
+            var employeeInDb = await _unitOfWork.Employees.GetById(id);
 
             if (employeeInDb == null)
             {
                 return NotFound("Employee with this id doesn't exist");
             }
 
-            await unitOfWork.Employees.Delete(employeeInDb);
-            unitOfWork.Save();
+            await _unitOfWork.Employees.Delete(employeeInDb);
+            _unitOfWork.Save();
 
             return Ok();
         }

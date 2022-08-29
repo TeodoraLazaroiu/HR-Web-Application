@@ -9,18 +9,18 @@ namespace WebAPI.Controllers
     [ApiController]
     public class TeamsController : ControllerBase
     {
-        private readonly IUnitOfWork unitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
 
         public TeamsController(IUnitOfWork unitOfWork)
         {
-            this.unitOfWork = unitOfWork;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: api/Teams
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TeamDTO>>> GetTeams()
         {
-            var teams = (await unitOfWork.Teams.GetAll()).Select(a => new TeamDTO(a)).ToList();
+            var teams = (await _unitOfWork.Teams.GetAll()).Select(a => new TeamDTO(a)).ToList();
             return teams;
         }
 
@@ -28,7 +28,7 @@ namespace WebAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<TeamDTO>> GetTeamByName(int id)
         {
-            var team = await unitOfWork.Teams.GetById(id);
+            var team = await _unitOfWork.Teams.GetById(id);
 
             if (team == null)
             {
@@ -42,7 +42,7 @@ namespace WebAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutTeam(int id, TeamDTO team)
         {
-            var teamInDb = await unitOfWork.Teams.GetById(id);
+            var teamInDb = await _unitOfWork.Teams.GetById(id);
 
             if (teamInDb == null)
             {
@@ -53,8 +53,8 @@ namespace WebAPI.Controllers
             teamInDb.TeamLeadId = team.TeamLeadId;
             teamInDb.LocationId = team.LocationId;
 
-            await unitOfWork.Teams.Update(teamInDb);
-            unitOfWork.Save();
+            await _unitOfWork.Teams.Update(teamInDb);
+            _unitOfWork.Save();
 
             return Ok();
         }
@@ -65,8 +65,8 @@ namespace WebAPI.Controllers
         {
             var teamToAdd = new Team(team);
 
-            await unitOfWork.Teams.Create(teamToAdd);
-            unitOfWork.Save();
+            await _unitOfWork.Teams.Create(teamToAdd);
+            _unitOfWork.Save();
 
             return Ok();
         }
@@ -75,15 +75,15 @@ namespace WebAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTeam(int id)
         {
-            var teamInDb = await unitOfWork.Teams.GetById(id);
+            var teamInDb = await _unitOfWork.Teams.GetById(id);
 
             if (teamInDb == null)
             {
                 return NotFound("Team with this id doesn't exist");
             }
 
-            await unitOfWork.Teams.Delete(teamInDb);
-            unitOfWork.Save();
+            await _unitOfWork.Teams.Delete(teamInDb);
+            _unitOfWork.Save();
 
             return Ok();
         }

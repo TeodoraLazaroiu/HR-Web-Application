@@ -9,18 +9,18 @@ namespace WebAPI.Controllers
     [ApiController]
     public class LeaveTypesController : ControllerBase
     {
-        private readonly IUnitOfWork unitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
 
         public LeaveTypesController(IUnitOfWork unitOfWork)
         {
-            this.unitOfWork = unitOfWork;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: api/LeaveTypes
         [HttpGet]
         public async Task<ActionResult<IEnumerable<LeaveTypeDTO>>> GetLeaveTypes()
         {
-            var leaveTypes = (await unitOfWork.LeaveTypes
+            var leaveTypes = (await _unitOfWork.LeaveTypes
                 .GetAll()).Select(a => new LeaveTypeDTO(a)).ToList();
             return leaveTypes;
         }
@@ -29,7 +29,7 @@ namespace WebAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<LeaveTypeDTO>> GetLeaveType(int id)
         {
-            var leaveType = await unitOfWork.LeaveTypes.GetById(id);
+            var leaveType = await _unitOfWork.LeaveTypes.GetById(id);
 
             if (leaveType == null)
             {
@@ -43,7 +43,7 @@ namespace WebAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutLeaveType(int id, LeaveTypeDTO leaveType)
         {
-            var leaveTypeInDb = await unitOfWork.LeaveTypes.GetById(id);
+            var leaveTypeInDb = await _unitOfWork.LeaveTypes.GetById(id);
 
             if (leaveTypeInDb == null)
             {
@@ -54,8 +54,8 @@ namespace WebAPI.Controllers
             leaveTypeInDb.NumberOfDays = leaveType.NumberOfDays;
             leaveTypeInDb.Description = leaveType.Description;
 
-            await unitOfWork.LeaveTypes.Update(leaveTypeInDb);
-            unitOfWork.Save();
+            await _unitOfWork.LeaveTypes.Update(leaveTypeInDb);
+            _unitOfWork.Save();
 
             return Ok();
         }
@@ -66,8 +66,8 @@ namespace WebAPI.Controllers
         {
             var leaveTypeToAdd = new LeaveType(leaveType);
 
-            await unitOfWork.LeaveTypes.Create(leaveTypeToAdd);
-            unitOfWork.Save();
+            await _unitOfWork.LeaveTypes.Create(leaveTypeToAdd);
+            _unitOfWork.Save();
 
             return Ok();
         }
@@ -76,15 +76,15 @@ namespace WebAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteLeaveType(int id)
         {
-            var leaveTypeInDb = await unitOfWork.LeaveTypes.GetById(id);
+            var leaveTypeInDb = await _unitOfWork.LeaveTypes.GetById(id);
 
             if (leaveTypeInDb == null)
             {
                 return NotFound("Leave Type with this id doesn't exist");
             }
 
-            await unitOfWork.LeaveTypes.Delete(leaveTypeInDb);
-            unitOfWork.Save();
+            await _unitOfWork.LeaveTypes.Delete(leaveTypeInDb);
+            _unitOfWork.Save();
 
             return Ok();
         }

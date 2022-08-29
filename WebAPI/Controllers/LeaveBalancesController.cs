@@ -9,18 +9,18 @@ namespace WebAPI.Controllers
     [ApiController]
     public class LeaveBalancesController : ControllerBase
     {
-        private readonly IUnitOfWork unitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
 
         public LeaveBalancesController(IUnitOfWork unitOfWork)
         {
-            this.unitOfWork = unitOfWork;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: api/LeaveBalances
         [HttpGet]
         public async Task<ActionResult<IEnumerable<LeaveBalanceDTO>>> GetLeaveBalances()
         {
-            var leaveBalances = (await unitOfWork.LeaveBalances.GetAll()).Select(a => new LeaveBalanceDTO(a)).ToList();
+            var leaveBalances = (await _unitOfWork.LeaveBalances.GetAll()).Select(a => new LeaveBalanceDTO(a)).ToList();
             return leaveBalances;
         }
 
@@ -28,7 +28,7 @@ namespace WebAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<LeaveBalanceDTO>> GetLeaveBalance(int id)
         {
-            var leaveBalance = await unitOfWork.LeaveBalances.GetById(id);
+            var leaveBalance = await _unitOfWork.LeaveBalances.GetById(id);
 
             if (leaveBalance == null)
             {
@@ -42,7 +42,7 @@ namespace WebAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutLeaveBalance(int id, LeaveBalanceDTO leaveBalance)
         {
-            var leaveBalanceInDb = await unitOfWork.LeaveBalances.GetById(id);
+            var leaveBalanceInDb = await _unitOfWork.LeaveBalances.GetById(id);
 
             if (leaveBalanceInDb == null)
             {
@@ -53,8 +53,8 @@ namespace WebAPI.Controllers
             leaveBalanceInDb.DaysTaken = leaveBalance.DaysTaken;
             leaveBalanceInDb.DaysRemaining = leaveBalance.DaysRemaining;
 
-            await unitOfWork.LeaveBalances.Update(leaveBalanceInDb);
-            unitOfWork.Save();
+            await _unitOfWork.LeaveBalances.Update(leaveBalanceInDb);
+            _unitOfWork.Save();
 
             return Ok();
         }
@@ -66,8 +66,8 @@ namespace WebAPI.Controllers
 
             var leaveBalanceToAdd = new LeaveBalance(leaveBalance);
 
-            await unitOfWork.LeaveBalances.Create(leaveBalanceToAdd);
-            unitOfWork.Save();
+            await _unitOfWork.LeaveBalances.Create(leaveBalanceToAdd);
+            _unitOfWork.Save();
 
             return Ok();
         }
@@ -76,15 +76,15 @@ namespace WebAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteLeaveBalance(int id)
         {
-            var leaveBalanceInDb = await unitOfWork.LeaveBalances.GetById(id);
+            var leaveBalanceInDb = await _unitOfWork.LeaveBalances.GetById(id);
 
             if (leaveBalanceInDb == null)
             {
                 return NotFound("Leave Balance with this id doesn't exist");
             }
 
-            await unitOfWork.LeaveBalances.Delete(leaveBalanceInDb);
-            unitOfWork.Save();
+            await _unitOfWork.LeaveBalances.Delete(leaveBalanceInDb);
+            _unitOfWork.Save();
 
             return Ok();
         }

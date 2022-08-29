@@ -15,9 +15,9 @@ namespace WebAPI.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IConfiguration _configuration;
-        public AuthenticationService(IUnitOfWork unitOfWork, IConfiguration configuration)
+        public AuthenticationService(IUnitOfWork _unitOfWork, IConfiguration configuration)
         {
-            _unitOfWork = unitOfWork;
+            _unitOfWork = _unitOfWork;
             _configuration = configuration;
         }
         public async Task<Token?> Authenticate(UserLoginDTO? user)
