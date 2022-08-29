@@ -10,6 +10,7 @@
         IJobHistoryRepository JobHistories { get; }
         ILeaveHistoryRepository LeaveHistories { get; }
         ILeaveBalanceRepository LeaveBalances { get; }
+        IUserRepository Users { get; }
         int Save();
     }
 }

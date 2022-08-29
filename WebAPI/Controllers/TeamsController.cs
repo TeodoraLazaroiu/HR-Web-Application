@@ -63,10 +63,7 @@ namespace WebAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<TeamDTO>> PostTeam(TeamDTO team)
         {
-            var teamToAdd = new Team();
-            teamToAdd.TeamName = team.TeamName;
-            teamToAdd.TeamLeadId = team.TeamLeadId;
-            teamToAdd.LocationId = team.LocationId;
+            var teamToAdd = new Team(team);
 
             await unitOfWork.Teams.Create(teamToAdd);
             unitOfWork.Save();

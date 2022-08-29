@@ -45,27 +45,15 @@ namespace WebAPI.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("LeaveBalanceId")
-                        .HasColumnType("int");
-
                     b.Property<int>("Salary")
                         .HasColumnType("int");
 
                     b.Property<int?>("TeamId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("EmployeeId");
 
-                    b.HasIndex("LeaveBalanceId")
-                        .IsUnique();
-
                     b.HasIndex("TeamId");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
 
                     b.ToTable("Employee");
                 });
@@ -123,7 +111,13 @@ namespace WebAPI.Migrations
                     b.Property<int>("DaysTotal")
                         .HasColumnType("int");
 
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
                     b.HasKey("LeaveBalanceId");
+
+                    b.HasIndex("EmployeeId")
+                        .IsUnique();
 
                     b.ToTable("LeaveBalance");
                 });
@@ -254,6 +248,9 @@ namespace WebAPI.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
                     b.Property<string>("HashedPassword")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -268,33 +265,20 @@ namespace WebAPI.Migrations
 
                     b.HasKey("UserId");
 
+                    b.HasIndex("EmployeeId")
+                        .IsUnique();
+
                     b.ToTable("User");
                 });
 
             modelBuilder.Entity("WebAPI.Models.Entities.Employee", b =>
                 {
-                    b.HasOne("WebAPI.Models.Entities.LeaveBalance", "LeaveBalance")
-                        .WithOne("Employee")
-                        .HasForeignKey("WebAPI.Models.Entities.Employee", "LeaveBalanceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("WebAPI.Models.Entities.Team", "Team")
                         .WithMany("Employees")
                         .HasForeignKey("TeamId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("WebAPI.Models.Entities.User", "User")
-                        .WithOne("Employee")
-                        .HasForeignKey("WebAPI.Models.Entities.Employee", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("LeaveBalance");
-
                     b.Navigation("Team");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("WebAPI.Models.Entities.JobHistory", b =>
@@ -314,6 +298,17 @@ namespace WebAPI.Migrations
                     b.Navigation("Employee");
 
                     b.Navigation("Job");
+                });
+
+            modelBuilder.Entity("WebAPI.Models.Entities.LeaveBalance", b =>
+                {
+                    b.HasOne("WebAPI.Models.Entities.Employee", "Employee")
+                        .WithOne("LeaveBalance")
+                        .HasForeignKey("WebAPI.Models.Entities.LeaveBalance", "EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
                 });
 
             modelBuilder.Entity("WebAPI.Models.Entities.LeaveHistory", b =>
@@ -344,21 +339,31 @@ namespace WebAPI.Migrations
                     b.Navigation("Location");
                 });
 
+            modelBuilder.Entity("WebAPI.Models.Entities.User", b =>
+                {
+                    b.HasOne("WebAPI.Models.Entities.Employee", "Employee")
+                        .WithOne("User")
+                        .HasForeignKey("WebAPI.Models.Entities.User", "EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+                });
+
             modelBuilder.Entity("WebAPI.Models.Entities.Employee", b =>
                 {
                     b.Navigation("JobHistories");
 
+                    b.Navigation("LeaveBalance");
+
                     b.Navigation("LeaveHistories");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("WebAPI.Models.Entities.Job", b =>
                 {
                     b.Navigation("JobHistories");
-                });
-
-            modelBuilder.Entity("WebAPI.Models.Entities.LeaveBalance", b =>
-                {
-                    b.Navigation("Employee");
                 });
 
             modelBuilder.Entity("WebAPI.Models.Entities.LeaveType", b =>
@@ -374,11 +379,6 @@ namespace WebAPI.Migrations
             modelBuilder.Entity("WebAPI.Models.Entities.Team", b =>
                 {
                     b.Navigation("Employees");
-                });
-
-            modelBuilder.Entity("WebAPI.Models.Entities.User", b =>
-                {
-                    b.Navigation("Employee");
                 });
 #pragma warning restore 612, 618
         }

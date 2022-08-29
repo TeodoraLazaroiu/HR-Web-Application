@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace WebAPI.Migrations
 {
-    public partial class FirstMigration : Migration
+    public partial class InitialMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -21,21 +21,6 @@ namespace WebAPI.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Job", x => x.JobId);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "LeaveBalance",
-                columns: table => new
-                {
-                    LeaveBalanceId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    DaysTotal = table.Column<int>(type: "int", nullable: false),
-                    DaysRemaining = table.Column<int>(type: "int", nullable: false),
-                    DaysTaken = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_LeaveBalance", x => x.LeaveBalanceId);
                 });
 
             migrationBuilder.CreateTable(
@@ -71,22 +56,6 @@ namespace WebAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "User",
-                columns: table => new
-                {
-                    UserId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    EmailAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    HashedPassword = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PasswordSalt = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Role = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_User", x => x.UserId);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Team",
                 columns: table => new
                 {
@@ -118,31 +87,17 @@ namespace WebAPI.Migrations
                     EmailAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     TeamId = table.Column<int>(type: "int", nullable: true),
                     CurrentJobId = table.Column<int>(type: "int", nullable: false),
-                    Salary = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    LeaveBalanceId = table.Column<int>(type: "int", nullable: false)
+                    Salary = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Employee", x => x.EmployeeId);
-                    table.ForeignKey(
-                        name: "FK_Employee_LeaveBalance_LeaveBalanceId",
-                        column: x => x.LeaveBalanceId,
-                        principalTable: "LeaveBalance",
-                        principalColumn: "LeaveBalanceId",
-                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Employee_Team_TeamId",
                         column: x => x.TeamId,
                         principalTable: "Team",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
-                    table.ForeignKey(
-                        name: "FK_Employee_User_UserId",
-                        column: x => x.UserId,
-                        principalTable: "User",
-                        principalColumn: "UserId",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -166,6 +121,28 @@ namespace WebAPI.Migrations
                         column: x => x.JobId,
                         principalTable: "Job",
                         principalColumn: "JobId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "LeaveBalance",
+                columns: table => new
+                {
+                    LeaveBalanceId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    EmployeeId = table.Column<int>(type: "int", nullable: false),
+                    DaysTotal = table.Column<int>(type: "int", nullable: false),
+                    DaysRemaining = table.Column<int>(type: "int", nullable: false),
+                    DaysTaken = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LeaveBalance", x => x.LeaveBalanceId);
+                    table.ForeignKey(
+                        name: "FK_LeaveBalance_Employee_EmployeeId",
+                        column: x => x.EmployeeId,
+                        principalTable: "Employee",
+                        principalColumn: "EmployeeId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -196,11 +173,28 @@ namespace WebAPI.Migrations
                         principalColumn: "Id");
                 });
 
-            migrationBuilder.CreateIndex(
-                name: "IX_Employee_LeaveBalanceId",
-                table: "Employee",
-                column: "LeaveBalanceId",
-                unique: true);
+            migrationBuilder.CreateTable(
+                name: "User",
+                columns: table => new
+                {
+                    UserId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    EmployeeId = table.Column<int>(type: "int", nullable: false),
+                    EmailAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    HashedPassword = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PasswordSalt = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Role = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_User", x => x.UserId);
+                    table.ForeignKey(
+                        name: "FK_User_Employee_EmployeeId",
+                        column: x => x.EmployeeId,
+                        principalTable: "Employee",
+                        principalColumn: "EmployeeId",
+                        onDelete: ReferentialAction.Cascade);
+                });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Employee_TeamId",
@@ -208,15 +202,15 @@ namespace WebAPI.Migrations
                 column: "TeamId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Employee_UserId",
-                table: "Employee",
-                column: "UserId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_JobHistories_JobId",
                 table: "JobHistories",
                 column: "JobId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LeaveBalance_EmployeeId",
+                table: "LeaveBalance",
+                column: "EmployeeId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_LeaveHistory_EmployeeId",
@@ -232,6 +226,12 @@ namespace WebAPI.Migrations
                 name: "IX_Team_LocationId",
                 table: "Team",
                 column: "LocationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_User_EmployeeId",
+                table: "User",
+                column: "EmployeeId",
+                unique: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -240,25 +240,25 @@ namespace WebAPI.Migrations
                 name: "JobHistories");
 
             migrationBuilder.DropTable(
+                name: "LeaveBalance");
+
+            migrationBuilder.DropTable(
                 name: "LeaveHistory");
+
+            migrationBuilder.DropTable(
+                name: "User");
 
             migrationBuilder.DropTable(
                 name: "Job");
 
             migrationBuilder.DropTable(
-                name: "Employee");
-
-            migrationBuilder.DropTable(
                 name: "LeaveType");
 
             migrationBuilder.DropTable(
-                name: "LeaveBalance");
+                name: "Employee");
 
             migrationBuilder.DropTable(
                 name: "Team");
-
-            migrationBuilder.DropTable(
-                name: "User");
 
             migrationBuilder.DropTable(
                 name: "Location");

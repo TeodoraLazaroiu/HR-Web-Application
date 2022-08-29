@@ -20,7 +20,8 @@ namespace WebAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<LeaveHistoryDTO>>> GetLeaveHistories()
         {
-            var leaveHistories = (await unitOfWork.LeaveHistories.GetAll()).Select(a => new LeaveHistoryDTO(a)).ToList();
+            var leaveHistories = (await unitOfWork.LeaveHistories
+                .GetAll()).Select(a => new LeaveHistoryDTO(a)).ToList();
             return leaveHistories;
         }
 

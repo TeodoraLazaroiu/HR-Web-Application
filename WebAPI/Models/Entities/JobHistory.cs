@@ -1,4 +1,6 @@
-﻿namespace WebAPI.Models.Entities
+﻿using WebAPI.Models.DTOs;
+
+namespace WebAPI.Models.Entities
 {
     public class JobHistory
     {
@@ -7,15 +9,15 @@
         public int JobId { get; set; }
         public Job? Job { get; set; }
 
-        public JobHistory(int eId, int jId)
-        {
-            this.EmployeeId = eId;
-            this.JobId = jId;
-        }
-
         public JobHistory()
         {
 
+        }
+
+        public JobHistory(JobHistoryDTO jobHistory)
+        {
+            this.EmployeeId = jobHistory.EmployeeId;
+            this.JobId = jobHistory.JobId;
         }
     }
 }

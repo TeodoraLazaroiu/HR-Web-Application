@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using WebAPI.Models.DTOs;
 
 namespace WebAPI.Models.Entities
 {
@@ -13,5 +14,15 @@ namespace WebAPI.Models.Entities
         public int? LocationId { get; set; }
         public Location? Location { get; set; }
         public IEnumerable<Employee> Employees { get; set; } = new HashSet<Employee>();
+        public Team()
+        {
+
+        }
+        public Team(TeamDTO team)
+        {
+            this.TeamName = team.TeamName;
+            this.TeamLeadId = team.TeamLeadId;
+            this.LocationId = team.LocationId;
+        }
     }
 }

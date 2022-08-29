@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using WebAPI.Models.DTOs;
 
 namespace WebAPI.Models.Entities
 {
@@ -16,16 +17,23 @@ namespace WebAPI.Models.Entities
         public int CurrentJobId { get; set; }
         public IEnumerable<JobHistory> JobHistories { get; set; } = new HashSet<JobHistory>();
         public int Salary { get; set; }
-        public int UserId { get; set; }
         public User? User { get; set; }
-        public int LeaveBalanceId { get; set; }
         public LeaveBalance? LeaveBalance { get; set; }
         public IEnumerable<LeaveHistory> LeaveHistories { get; set; } = new HashSet<LeaveHistory>();
 
         public Employee()
         {
-            UserId = EmployeeId;
-            LeaveBalanceId = EmployeeId;
+
+        }
+
+        public Employee(EmployeeDTO employee)
+        {
+            this.FirstName = employee.FirstName;
+            this.LastName = employee.LastName;
+            this.EmailAddress = employee.EmailAddress;
+            this.TeamId = employee.TeamId;
+            this.CurrentJobId = employee.CurrentJobId;
+            this.Salary = employee.Salary;
         }
     }
 }

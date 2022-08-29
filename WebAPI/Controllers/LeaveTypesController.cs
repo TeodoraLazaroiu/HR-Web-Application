@@ -20,7 +20,8 @@ namespace WebAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<LeaveTypeDTO>>> GetLeaveTypes()
         {
-            var leaveTypes = (await unitOfWork.LeaveTypes.GetAll()).Select(a => new LeaveTypeDTO(a)).ToList();
+            var leaveTypes = (await unitOfWork.LeaveTypes
+                .GetAll()).Select(a => new LeaveTypeDTO(a)).ToList();
             return leaveTypes;
         }
 
@@ -63,10 +64,7 @@ namespace WebAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<LeaveTypeDTO>> PostLeaveType(LeaveTypeDTO leaveType)
         {
-            var leaveTypeToAdd = new LeaveType();
-            leaveTypeToAdd.LeaveName = leaveType.LeaveName;
-            leaveTypeToAdd.NumberOfDays = leaveType.NumberOfDays;
-            leaveTypeToAdd.Description = leaveType.Description;
+            var leaveTypeToAdd = new LeaveType(leaveType);
 
             await unitOfWork.LeaveTypes.Create(leaveTypeToAdd);
             unitOfWork.Save();

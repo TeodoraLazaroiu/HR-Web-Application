@@ -58,5 +58,35 @@ namespace WebAPI.Controllers
 
             return Ok();
         }
+
+        // POST: api/LeaveBalances
+        [HttpPost]
+        public async Task<ActionResult<LeaveBalanceDTO>> PostLeaveBalance(LeaveBalanceDTO leaveBalance)
+        {
+
+            var leaveBalanceToAdd = new LeaveBalance(leaveBalance);
+
+            await unitOfWork.LeaveBalances.Create(leaveBalanceToAdd);
+            unitOfWork.Save();
+
+            return Ok();
+        }
+
+        // DELETE: api/LeaveBalances/id
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteLeaveBalance(int id)
+        {
+            var leaveBalanceInDb = await unitOfWork.LeaveBalances.GetById(id);
+
+            if (leaveBalanceInDb == null)
+            {
+                return NotFound("Leave Balance with this id doesn't exist");
+            }
+
+            await unitOfWork.LeaveBalances.Delete(leaveBalanceInDb);
+            unitOfWork.Save();
+
+            return Ok();
+        }
     }
 }

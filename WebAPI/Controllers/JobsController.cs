@@ -64,9 +64,7 @@ namespace WebAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<JobDTO>> PostJob(JobDTO job)
         {
-            var jobToAdd = new Job();
-            jobToAdd.JobTitle = job.JobTitle;
-            jobToAdd.JobDescription = job.JobDescription;
+            var jobToAdd = new Job(job);
 
             await unitOfWork.Jobs.Create(jobToAdd);
             unitOfWork.Save();

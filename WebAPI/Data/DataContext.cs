@@ -24,6 +24,16 @@ namespace WebAPI.Data
 
             // One to One Relationships
 
+            modelBuilder.Entity<Employee>()
+                .HasOne(a => a.User)
+                .WithOne(b => b.Employee)
+                .HasForeignKey<User>("EmployeeId");
+
+            modelBuilder.Entity<Employee>()
+                .HasOne(a => a.LeaveBalance)
+                .WithOne(b => b.Employee)
+                .HasForeignKey<LeaveBalance>("EmployeeId");
+
 
             // One to Many Relationships
 

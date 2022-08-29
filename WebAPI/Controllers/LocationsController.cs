@@ -20,7 +20,8 @@ namespace WebAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<LocationDTO>>> GetLocations()
         {
-            var locations = (await unitOfWork.Locations.GetAll()).Select(a => new LocationDTO(a)).ToList();
+            var locations = (await unitOfWork.Locations
+                .GetAll()).Select(a => new LocationDTO(a)).ToList();
             return locations;
         }
 
@@ -65,12 +66,7 @@ namespace WebAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<LocationDTO>> PostLocation(LocationDTO location)
         {
-            var locationToAdd = new Location();
-            locationToAdd.City = location.City;
-            locationToAdd.Country = location.Country;
-            locationToAdd.PostalCode = location.PostalCode;
-            locationToAdd.Street = location.Street;
-            locationToAdd.Number = location.Number;
+            var locationToAdd = new Location(location);
 
             await unitOfWork.Locations.Create(locationToAdd);
             unitOfWork.Save();
