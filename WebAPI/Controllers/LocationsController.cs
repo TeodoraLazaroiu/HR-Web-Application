@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WebAPI.Models.DTOs;
 using WebAPI.Models.Entities;
 using WebAPI.Repository.Interfaces;
@@ -6,6 +7,7 @@ using WebAPI.Repository.Interfaces;
 namespace WebAPI.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
     public class LocationsController : ControllerBase
     {
@@ -41,6 +43,7 @@ namespace WebAPI.Controllers
 
         // PUT: api/Locations/id
         [HttpPut("{id}")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> PutLocation(int id, LocationDTO location)
         {
             var locationInDb = await _unitOfWork.Locations.GetById(id);
@@ -64,6 +67,7 @@ namespace WebAPI.Controllers
 
         // POST: api/Locations
         [HttpPost]
+        [Authorize(Roles = "admin")]
         public async Task<ActionResult<LocationDTO>> PostLocation(LocationDTO location)
         {
             var locationToAdd = new Location(location);
@@ -76,6 +80,7 @@ namespace WebAPI.Controllers
 
         // DELETE: api/Locations/id
         [HttpDelete("{id}")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> DeleteLocation(int id)
         {
             var locationInDb = await _unitOfWork.Locations.GetById(id);

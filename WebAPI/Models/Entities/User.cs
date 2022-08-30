@@ -1,15 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using WebAPI.Models.DTOs;
 
 namespace WebAPI.Models.Entities
 {
     [Table("User")]
     public class User
     {
-        private int v;
-        private string salt;
-
         [Key]
         public int UserId { get; set; }
         public int EmployeeId { get; set; }
@@ -17,12 +13,12 @@ namespace WebAPI.Models.Entities
         public string EmailAddress { get; set; } = string.Empty;
         public string HashedPassword { get; set; } = string.Empty;
         public string PasswordSalt { get; set; } = string.Empty;
-        public string Role { get; set; } = string.Empty;
+        public RoleType Role { get; set; } = RoleType.user;
         public User()
         {
 
         }
-        public User(int employeeId, string emailAddress, string hashedPassword, string salt, string role)
+        public User(int employeeId, string emailAddress, string hashedPassword, string salt, RoleType role)
         {
             EmployeeId = employeeId;
             EmailAddress = emailAddress;

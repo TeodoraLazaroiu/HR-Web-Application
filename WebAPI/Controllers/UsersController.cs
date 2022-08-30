@@ -8,8 +8,7 @@ using WebAPI.Services;
 
 namespace API.Controllers
 {
-	[AllowAnonymous]
-	[Route("api/users")]
+	[Route("api/[controller]")]
 	[ApiController]
 	public class UsersController : ControllerBase
 	{
@@ -23,7 +22,8 @@ namespace API.Controllers
 		}
 
 		[HttpPost]
-		[Route("authentication")]
+		[AllowAnonymous]
+		[Route("Login")]
 		public async Task<IActionResult> Authenticate(UserLoginDTO user)
 		{
 			Token? token;
@@ -45,20 +45,38 @@ namespace API.Controllers
 		}
 
 		[HttpPost]
-		[Route("register")]
-		public async Task<ActionResult<UserRegisterDTO>> PostUser(UserRegisterDTO user)
+		[Authorize(Roles = "admin")]
+		[Route("Register")]
+		public async Task<IActionResult> PostUser(UserRegisterDTO user)
 		{
-			User newUser;
-
 			try
 			{
-				newUser = await _service.Register(user);
+				var newUser = await _service.Register(user);
 				await _unitOfWork.Users.Create(newUser);
+				_unitOfWork.Save();
 			}
 			catch (Exception e)
 			{
 				return BadRequest(e.Message);
 			}
+
+			return Ok();
+		}
+
+		// DELETE: api/Users/id
+		[HttpDelete("{id}")]
+		[Authorize(Roles = "admin")]
+		public async Task<IActionResult> DeleteUser(int id)
+		{
+			var userInDb = await _unitOfWork.Users.GetById(id);
+
+			if (userInDb == null)
+			{
+				return NotFound("User with this id doesn't exist");
+			}
+
+			await _unitOfWork.Users.Delete(userInDb);
+			_unitOfWork.Save();
 
 			return Ok();
 		}

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WebAPI.Models.DTOs;
 using WebAPI.Models.Entities;
 using WebAPI.Repository.Interfaces;
@@ -6,6 +7,7 @@ using WebAPI.Repository.Interfaces;
 namespace WebAPI.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
     public class JobHistoryController : ControllerBase
     {
@@ -41,6 +43,7 @@ namespace WebAPI.Controllers
 
         // PUT: api/JobHistories/id
         [HttpPut("{id}")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> PutJobHistory(int id, JobHistoryDTO job)
         {
             var jobHistoryInDb = await _unitOfWork.JobHistories.GetById(id);
@@ -61,6 +64,7 @@ namespace WebAPI.Controllers
 
         // POST: api/JobHistories
         [HttpPost]
+        [Authorize(Roles = "admin")]
         public async Task<ActionResult<JobHistoryDTO>> PostJobHistory(JobHistoryDTO jobHistory)
         {
             var jobHistoryToAdd = new JobHistory(jobHistory);
@@ -73,6 +77,7 @@ namespace WebAPI.Controllers
 
         // DELETE: api/JobHistories/eid/jid
         [HttpDelete("{eid}/{jid}")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> DeleteJob(int eid, int jid)
         {
             var jobHistoryInDb = await _unitOfWork.JobHistories.GetByBothIds(eid, jid);

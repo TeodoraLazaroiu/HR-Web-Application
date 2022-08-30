@@ -15,9 +15,9 @@ namespace WebAPI.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IConfiguration _configuration;
-        public AuthenticationService(IUnitOfWork _unitOfWork, IConfiguration configuration)
+        public AuthenticationService(IUnitOfWork unitOfWork, IConfiguration configuration)
         {
-            _unitOfWork = _unitOfWork;
+            _unitOfWork = unitOfWork;
             _configuration = configuration;
         }
         public async Task<Token?> Authenticate(UserLoginDTO? user)
@@ -25,13 +25,13 @@ namespace WebAPI.Services
             if (user == null || user.EmailAddress == null || user.Password == null
                 || user.EmailAddress == "" || user.Password == "")
             {
-                throw new Exception("Must enter a username and password");
+                throw new Exception("Must enter a email and password");
             }
 
             var userInDb = await _unitOfWork.Users.GetUserByEmail(user.EmailAddress);
             if (userInDb == null)
             {
-                throw new Exception("Username doesn't exist");
+                throw new Exception("User doesn't exist");
             }
 
             string salt = userInDb.PasswordSalt;
@@ -53,7 +53,11 @@ namespace WebAPI.Services
             var tokenKey = Encoding.UTF8.GetBytes(_configuration["JWT:Key"]);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new Claim[] { new Claim(ClaimTypes.Email, user.EmailAddress) }),
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim(ClaimTypes.Email, userInDb.EmailAddress),
+                    new Claim(ClaimTypes.Role, userInDb.Role.ToString())
+                }),
                 Expires = DateTime.UtcNow.AddMinutes(20),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(tokenKey),
                 SecurityAlgorithms.HmacSha256Signature),
@@ -69,21 +73,26 @@ namespace WebAPI.Services
             if (user == null || user.EmailAddress == "" || user.Password == ""
                 || user.EmailAddress == null || user.Password == null)
             {
-                throw new Exception("Must enter a username and password");
+                throw new Exception("Must enter an email and password");
+            }
+
+            if (user.Role.ToLower() != "admin" && user.Role.ToLower() != "user")
+            {
+                throw new Exception("Role must be admin or user");
             }
 
             var userInDb = await _unitOfWork.Users.GetUserByEmail(user.EmailAddress);
 
             if (userInDb != null)
             {
-                throw new Exception("User with this name already exists");
+                throw new Exception("User with this email already exists");
             }
 
             int employee = user.EmployeeId;
             string email = user.EmailAddress;
             string salt = GenerateSalt();
             string hashedPassword = HashPassword(user.Password, salt);
-            string role = user.Role;
+            RoleType role = (RoleType)Enum.Parse(typeof(RoleType), user.Role.ToLower());
 
             User newUser = new(employee, email, hashedPassword, salt, role);
             return newUser;

@@ -1,13 +1,12 @@
 ﻿namespace WebAPI.Models.DTOs
 {
-    public class UserRegisterDTO
+    public class UserDTO
     {
         public int EmployeeId { get; set; }
         public string EmailAddress { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
         public string Role { get; set; }
 
-        public UserRegisterDTO()
+        public UserDTO()
         {
 
         }

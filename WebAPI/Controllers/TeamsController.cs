@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WebAPI.Models.DTOs;
 using WebAPI.Models.Entities;
 using WebAPI.Repository.Interfaces;
@@ -7,6 +8,7 @@ namespace WebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class TeamsController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -40,6 +42,7 @@ namespace WebAPI.Controllers
 
         // PUT: api/Teams/id
         [HttpPut("{id}")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> PutTeam(int id, TeamDTO team)
         {
             var teamInDb = await _unitOfWork.Teams.GetById(id);
@@ -61,6 +64,7 @@ namespace WebAPI.Controllers
 
         // POST: api/Teams
         [HttpPost]
+        [Authorize(Roles = "admin")]
         public async Task<ActionResult<TeamDTO>> PostTeam(TeamDTO team)
         {
             var teamToAdd = new Team(team);
@@ -73,6 +77,7 @@ namespace WebAPI.Controllers
 
         // DELETE: api/Teams/name
         [HttpDelete("{id}")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> DeleteTeam(int id)
         {
             var teamInDb = await _unitOfWork.Teams.GetById(id);

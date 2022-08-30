@@ -2,10 +2,12 @@
 using WebAPI.Models.Entities;
 using WebAPI.Models.DTOs;
 using WebAPI.Repository.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebAPI.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
     public class EmployeesController : ControllerBase
     {
@@ -41,6 +43,7 @@ namespace WebAPI.Controllers
 
         // PUT: api/Employees/5
         [HttpPut("{id}")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> PutEmployee(int id, EmployeeDTO employee)
         {
             var employeeInDb = await _unitOfWork.Employees.GetById(id);
@@ -64,7 +67,8 @@ namespace WebAPI.Controllers
         }
 
         // POST: api/Employees
-       [HttpPost]
+        [HttpPost]
+        [Authorize(Roles = "admin")]
         public async Task<ActionResult<EmployeeDTO>> PostEmployee(EmployeeDTO employee)
         {
 
@@ -78,6 +82,7 @@ namespace WebAPI.Controllers
 
         // DELETE: api/Employees/id
         [HttpDelete("{id}")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> DeleteEmployee(int id)
         {
             var employeeInDb = await _unitOfWork.Employees.GetById(id);

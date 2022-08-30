@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using WebAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +14,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(connectionString));
 
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 
 var myAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
@@ -98,7 +100,7 @@ app.UseHttpsRedirection();
 
 app.UseCors(myAllowSpecificOrigins);
 
-app.UseAuthorization();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

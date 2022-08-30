@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WebAPI.Models.DTOs;
 using WebAPI.Models.Entities;
 using WebAPI.Repository.Interfaces;
@@ -6,6 +7,7 @@ using WebAPI.Repository.Interfaces;
 namespace WebAPI.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
     public class LeaveTypesController : ControllerBase
     {
@@ -41,6 +43,7 @@ namespace WebAPI.Controllers
 
         // PUT: api/LeaveTypes/id
         [HttpPut("{id}")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> PutLeaveType(int id, LeaveTypeDTO leaveType)
         {
             var leaveTypeInDb = await _unitOfWork.LeaveTypes.GetById(id);
@@ -62,6 +65,7 @@ namespace WebAPI.Controllers
 
         // POST: api/LeaveTypes
         [HttpPost]
+        [Authorize(Roles = "admin")]
         public async Task<ActionResult<LeaveTypeDTO>> PostLeaveType(LeaveTypeDTO leaveType)
         {
             var leaveTypeToAdd = new LeaveType(leaveType);
@@ -74,6 +78,7 @@ namespace WebAPI.Controllers
 
         // DELETE: api/LeaveTypes/id
         [HttpDelete("{id}")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> DeleteLeaveType(int id)
         {
             var leaveTypeInDb = await _unitOfWork.LeaveTypes.GetById(id);

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WebAPI.Models.DTOs;
 using WebAPI.Models.Entities;
 using WebAPI.Repository.Interfaces;
@@ -6,6 +7,7 @@ using WebAPI.Repository.Interfaces;
 namespace WebAPI.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
     public class LeaveBalancesController : ControllerBase
     {
@@ -40,6 +42,7 @@ namespace WebAPI.Controllers
 
         // PUT: api/LeaveBalances/id
         [HttpPut("{id}")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> PutLeaveBalance(int id, LeaveBalanceDTO leaveBalance)
         {
             var leaveBalanceInDb = await _unitOfWork.LeaveBalances.GetById(id);
@@ -61,6 +64,7 @@ namespace WebAPI.Controllers
 
         // POST: api/LeaveBalances
         [HttpPost]
+        [Authorize(Roles = "admin")]
         public async Task<ActionResult<LeaveBalanceDTO>> PostLeaveBalance(LeaveBalanceDTO leaveBalance)
         {
 
@@ -74,6 +78,7 @@ namespace WebAPI.Controllers
 
         // DELETE: api/LeaveBalances/id
         [HttpDelete("{id}")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> DeleteLeaveBalance(int id)
         {
             var leaveBalanceInDb = await _unitOfWork.LeaveBalances.GetById(id);

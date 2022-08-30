@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.Data;
 using WebAPI.Models.DTOs;
@@ -8,6 +9,7 @@ using WebAPI.Repository.Interfaces;
 namespace WebAPI.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
     public class JobsController : ControllerBase
     {
@@ -42,6 +44,7 @@ namespace WebAPI.Controllers
 
         // PUT: api/Jobs/id
         [HttpPut("{id}")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> PutJob(int id, JobDTO job)
         {
             var jobInDb = await _unitOfWork.Jobs.GetById(id);
@@ -62,6 +65,7 @@ namespace WebAPI.Controllers
 
         // POST: api/Jobs
         [HttpPost]
+        [Authorize(Roles = "admin")]
         public async Task<ActionResult<JobDTO>> PostJob(JobDTO job)
         {
             var jobToAdd = new Job(job);
@@ -74,6 +78,7 @@ namespace WebAPI.Controllers
 
         // DELETE: api/Jobs/id
         [HttpDelete("{id}")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> DeleteJob(int id)
         {
             var jobInDb = await _unitOfWork.Jobs.GetById(id);

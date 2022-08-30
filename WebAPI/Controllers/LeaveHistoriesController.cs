@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WebAPI.Models.DTOs;
 using WebAPI.Models.Entities;
 using WebAPI.Repository.Interfaces;
@@ -6,6 +7,7 @@ using WebAPI.Repository.Interfaces;
 namespace WebAPI.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
     public class LeaveHistoriesController : ControllerBase
     {
@@ -42,6 +44,7 @@ namespace WebAPI.Controllers
         // PUT: api/LeaveTypes/id
         // for HR to accept or decline the leave
         [HttpPut("{id}")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> PutLeaveHistory(int id, LeaveHistoryDTO leaveHistory)
         {
             var leaveHistoryInDb = await _unitOfWork.LeaveHistories.GetById(id);
