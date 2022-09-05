@@ -8,7 +8,6 @@ namespace WebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class TeamsController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;

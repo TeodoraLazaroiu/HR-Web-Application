@@ -45,7 +45,7 @@ namespace API.Controllers
 		}
 
 		[HttpPost]
-		[Authorize(Roles = "admin")]
+		[AllowAnonymous]
 		[Route("Register")]
 		public async Task<IActionResult> PostUser(UserRegisterDTO user)
 		{

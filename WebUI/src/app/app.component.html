@@ -15,6 +15,11 @@
 		<ul>
 			<li><a class="nav-link" routerLink="/team-time-off" routerLinkActive="text-primary">Team time off</a></li>
 		</ul>
+    <small class="text-muted px-3">Account</small>
+    <ul>
+      <li class="nav-item"><a class="nav-link light-text" routerLink="/login" routerLinkActive="text-primary" *ngIf="!isLoggedInVar">Login</a></li>
+      <li class="nav-item"><a class="nav-link light-text" routerLink="/login" *ngIf="isLoggedInVar" (click)="LogOut()">Logout</a></li>
+    </ul>
 	</div>
   <div id="main">
     <router-outlet></router-outlet>

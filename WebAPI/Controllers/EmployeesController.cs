@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Authorization;
 namespace WebAPI.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize]
     [ApiController]
     public class EmployeesController : ControllerBase
     {
@@ -68,7 +67,6 @@ namespace WebAPI.Controllers
 
         // POST: api/Employees
         [HttpPost]
-        [Authorize(Roles = "admin")]
         public async Task<ActionResult<EmployeeDTO>> PostEmployee(EmployeeDTO employee)
         {
 
