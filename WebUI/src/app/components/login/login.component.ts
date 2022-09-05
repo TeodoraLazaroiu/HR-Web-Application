@@ -9,7 +9,7 @@ import { UsersService } from 'src/app/services/users.service';
 })
 export class LoginComponent implements OnInit {
 
-  username: string = "";
+  emailAddress: string = "";
   password: string = "";
   
   responseData: any;
@@ -22,7 +22,7 @@ export class LoginComponent implements OnInit {
 
   ProceedLogin() {
     var user = {
-      name: this.username,
+      emailAddress: this.emailAddress,
       password: this.password
     }
     

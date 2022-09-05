@@ -10,7 +10,7 @@
         <div class="form-outline mb-4">
             <label class="form-label" for="loginName">Username</label>
             <input type="text" id="loginName" class="form-control"
-             [(ngModel)]="username" name="username" placeholder="example: admin"/>
+             [(ngModel)]="emailAddress" name="emailAddress" placeholder="example: admin@company.com"/>
         </div>
   
         <!-- Password input -->
@@ -21,7 +21,8 @@
         </div>
   
         <!-- Submit button -->
-        <button type="submit" class="btn btn-primary btn-block mb-4" id="signInButton">Sign in</button>
+        <button type="submit" class="btn btn-primary btn-block mb-4" id="signInButton"
+        (click)="ProceedLogin()">Sign in</button>
   
       </form>
     </div>

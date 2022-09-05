@@ -9,10 +9,12 @@ export class UsersService{
 
   readonly apiurl = "https://localhost:7278/api";
   isLoggedInVar: boolean = this.IsLoggedIn();
+  userData: any;
 
   constructor(private http:HttpClient) { }
   
   ProceedLogin(user:any) {
+    this.userData = this.http.get(this.apiurl + `/Users/${user.emailAddress}`);
     return this.http.post(this.apiurl + '/Users/Login', user);
   }
 
@@ -27,5 +29,9 @@ export class UsersService{
 
   GetToken() {
     return localStorage.getItem('token') || '';
+  }
+
+  GetEmployee(id:number) {
+    return this.http.get(this.apiurl + `/Employees/${id}`);
   }
 }

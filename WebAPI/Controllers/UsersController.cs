@@ -21,6 +21,20 @@ namespace API.Controllers
 			_service = service;
 		}
 
+		// GET: api/User/email
+		[HttpGet("{email}")]
+		public async Task<ActionResult<UserDTO>> GetUser(string email)
+		{
+			var user = await _unitOfWork.Users.GetUserByEmail(email);
+
+			if (user == null)
+			{
+				return NotFound("User with this email doesn't exist");
+			}
+
+			return new UserDTO(user);
+		}
+
 		[HttpPost]
 		[AllowAnonymous]
 		[Route("Login")]

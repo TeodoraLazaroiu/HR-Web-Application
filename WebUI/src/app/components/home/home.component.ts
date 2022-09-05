@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
+import { UsersService } from 'src/app/services/users.service';
 
 @Component({
   selector: 'app-home',
@@ -7,9 +9,20 @@ import { Component, OnInit } from '@angular/core';
 })
 export class HomeComponent implements OnInit {
 
-  constructor() { }
+  employeeData: any;
+
+  employeeId: number = 5;
+  email: string = "";
+  role: number = 0;
+
+  constructor(private service:UsersService) {
+  }
 
   ngOnInit(): void {
+    this.service.GetEmployee(this.employeeId).subscribe(res =>
+      {
+        this.employeeData = res;
+      });
   }
 
 }

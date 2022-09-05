@@ -1,4 +1,6 @@
-﻿namespace WebAPI.Models.DTOs
+﻿using WebAPI.Models.Entities;
+
+namespace WebAPI.Models.DTOs
 {
     public class UserRegisterDTO
     {
