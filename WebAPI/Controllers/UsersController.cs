@@ -9,6 +9,7 @@ using WebAPI.Services;
 namespace API.Controllers
 {
 	[Route("api/[controller]")]
+	[Authorize]
 	[ApiController]
 	public class UsersController : ControllerBase
 	{
@@ -21,9 +22,8 @@ namespace API.Controllers
 			_service = service;
 		}
 
-		// GET: api/User/email
 		[HttpGet("{email}")]
-		public async Task<ActionResult<UserDTO>> GetUser(string email)
+		public async Task<IActionResult> GetUser(string email)
 		{
 			var user = await _unitOfWork.Users.GetUserByEmail(email);
 
@@ -32,7 +32,7 @@ namespace API.Controllers
 				return NotFound("User with this email doesn't exist");
 			}
 
-			return new UserDTO(user);
+			return Ok(new UserDTO(user));
 		}
 
 		[HttpPost]
@@ -63,9 +63,10 @@ namespace API.Controllers
 		[Route("Register")]
 		public async Task<IActionResult> PostUser(UserRegisterDTO user)
 		{
+			User newUser;
 			try
 			{
-				var newUser = await _service.Register(user);
+				newUser = await _service.Register(user);
 				await _unitOfWork.Users.Create(newUser);
 				_unitOfWork.Save();
 			}
@@ -74,10 +75,9 @@ namespace API.Controllers
 				return BadRequest(e.Message);
 			}
 
-			return Ok();
+			return CreatedAtAction(nameof(GetUser), newUser);
 		}
 
-		// DELETE: api/Users/id
 		[HttpDelete("{id}")]
 		[Authorize(Roles = "admin")]
 		public async Task<IActionResult> DeleteUser(int id)
