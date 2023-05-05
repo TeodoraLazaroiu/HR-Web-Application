@@ -40,12 +40,18 @@ namespace UnitTests
         }
 
         [Test]
-        public void AuthenticateUser_NullCredentials_ShouldThrowError()
+        [TestCase("email@address.com", null)]
+        [TestCase("email@address.com", "")]
+        [TestCase(null, "P@ssw0rd")]
+        [TestCase("", "P@ssw0rd")]
+        [TestCase(null, null)]
+        [TestCase("", "")]
+        public void AuthenticateUser_NullCredentials_ShouldThrowError(string email, string password)
         {
             var invalidUser = new UserLoginDTO()
             {
-                EmailAddress = "",
-                Password = ""
+                EmailAddress = email,
+                Password = password
             };
 
             var exception = Assert.ThrowsAsync<Exception>(async () => await _authenticationService.Authenticate(invalidUser) );
