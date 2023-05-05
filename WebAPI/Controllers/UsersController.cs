@@ -40,7 +40,7 @@ namespace API.Controllers
 		[Route("Login")]
 		public async Task<IActionResult> Authenticate(UserLoginDTO user)
 		{
-			Token? token;
+			Token token;
 			try
 			{
 				token = await _service.Authenticate(user);
@@ -48,11 +48,6 @@ namespace API.Controllers
 			catch (Exception e)
 			{
 				return BadRequest(e.Message);
-			}
-
-			if (token == null)
-			{
-				return Unauthorized();
 			}
 
 			return Ok(token);

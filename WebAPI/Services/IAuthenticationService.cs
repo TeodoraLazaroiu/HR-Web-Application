@@ -6,7 +6,7 @@ namespace WebAPI.Services
 {
     public interface IAuthenticationService
     {
-        Task<Token?> Authenticate(UserLoginDTO? user);
+        Task<Token> Authenticate(UserLoginDTO? user);
         Task<User> Register(UserRegisterDTO user);
         string GenerateSalt();
         string HashPassword(string password, string salt);

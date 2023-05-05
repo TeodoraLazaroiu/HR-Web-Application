@@ -99,18 +99,6 @@ namespace UnitTests
         }
 
         [Test]
-        public async Task AuthenticateUser_TokenIsNull_ShouldReturnUnauthorized()
-        {
-            _authServiceMock.Setup(x => x.Authenticate(_userLogin)).ReturnsAsync((Token?)null);
-
-            var response = await _controller.Authenticate(_userLogin);
-            var result = response as UnauthorizedResult;
-
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.StatusCode, Is.EqualTo(StatusCodes.Status401Unauthorized));
-        }
-
-        [Test]
         public async Task CreateUser_ValidRequest_ShouldSaveUserInDb()
         {
 

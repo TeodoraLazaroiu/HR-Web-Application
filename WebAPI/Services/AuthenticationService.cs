@@ -20,7 +20,7 @@ namespace WebAPI.Services
             _unitOfWork = unitOfWork;
             _configuration = configuration;
         }
-        public async Task<Token?> Authenticate(UserLoginDTO? user)
+        public async Task<Token> Authenticate(UserLoginDTO? user)
         {
             if (user == null || user.EmailAddress == null || user.Password == null
                 || user.EmailAddress == "" || user.Password == "")
@@ -36,11 +36,7 @@ namespace WebAPI.Services
 
             string salt = userInDb.PasswordSalt;
             string hashedPassword;
-            if (salt != null)
-            {
-                hashedPassword = HashPassword(user.Password, salt);
-            }
-            else return null;
+            hashedPassword = HashPassword(user.Password, salt);
 
             userInDb = await _unitOfWork.Users.GetUserByEmailAndHashedPassword(user.EmailAddress, hashedPassword);
 
