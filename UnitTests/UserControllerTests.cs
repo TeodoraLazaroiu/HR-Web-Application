@@ -72,6 +72,7 @@ namespace UnitTests
 
             Assert.That(result, Is.Not.Null);
             Assert.That(result.StatusCode, Is.EqualTo(StatusCodes.Status404NotFound));
+            Assert.That(result.Value, Is.EqualTo("User with this email doesn't exist"));
         }
         
         [Test]
@@ -165,6 +166,7 @@ namespace UnitTests
 
             Assert.That(result, Is.Not.Null);
             Assert.That(result.StatusCode, Is.EqualTo(StatusCodes.Status404NotFound));
+            Assert.That(result.Value, Is.EqualTo("User with this id doesn't exist"));
         }
     }
 }
