@@ -55,7 +55,7 @@ namespace UnitTests
             };
 
             var exception = Assert.ThrowsAsync<Exception>(async () => await _authenticationService.Authenticate(invalidUser) );
-            Assert.That(exception.Message, Is.EqualTo("Must enter a email and password"));
+            Assert.That(exception.Message, Is.EqualTo("Must enter an email and password"));
         }
 
         [Test]
@@ -68,7 +68,7 @@ namespace UnitTests
             };
 
             var exception = Assert.ThrowsAsync<Exception>(async () => await _authenticationService.Authenticate(invalidUser));
-            Assert.That(exception.Message, Is.EqualTo("User doesn't exist"));
+            Assert.That(exception.Message, Is.EqualTo("Invalid username or password"));
         }
 
         [Test]
@@ -76,7 +76,7 @@ namespace UnitTests
         {
             var invalidUser = new UserLoginDTO()
             {
-                EmailAddress = "P@ssw0rd",
+                EmailAddress = "email@address.com",
                 Password = "invalid"
             };
 
@@ -84,7 +84,7 @@ namespace UnitTests
             _user.HashedPassword = _authenticationService.HashPassword(invalidUser.Password, _user.PasswordSalt);
 
             var exception = Assert.ThrowsAsync<Exception>(async () => await _authenticationService.Authenticate(invalidUser));
-            Assert.That(exception.Message, Is.EqualTo("User doesn't exist"));
+            Assert.That(exception.Message, Is.EqualTo("Invalid username or password"));
         }
 
         [Test]
@@ -100,6 +100,9 @@ namespace UnitTests
             _configurationMock.SetupGet(x => x["JWT:Audience"]).Returns("audience");
 
             var token = await _authenticationService.Authenticate(_validUser);
+            Assert.That(token, Is.Not.Null);
+            Assert.That(token, Is.TypeOf<Token>());
         }
+
     }
 }

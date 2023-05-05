@@ -20,49 +20,49 @@ namespace WebAPI.Services
             _unitOfWork = unitOfWork;
             _configuration = configuration;
         }
-        public async Task<Token> Authenticate(UserLoginDTO? user)
+public async Task<Token> Authenticate(UserLoginDTO? user)
+{
+    if (user == null || user.EmailAddress == null || user.Password == null
+        || user.EmailAddress == "" || user.Password == "")
+    {
+        throw new Exception("Must enter an email and password");
+    }
+
+    var userInDb = await _unitOfWork.Users.GetUserByEmail(user.EmailAddress);
+    if (userInDb == null)
+    {
+        throw new Exception("Invalid username or password");
+    }
+
+    string salt = userInDb.PasswordSalt;
+    string hashedPassword;
+    hashedPassword = HashPassword(user.Password, salt);
+
+    userInDb = await _unitOfWork.Users.GetUserByEmailAndHashedPassword(user.EmailAddress, hashedPassword);
+
+    if (userInDb == null)
+    {
+        throw new Exception("Invalid username or password");
+    }
+
+    var tokenHandler = new JwtSecurityTokenHandler();
+    var tokenKey = Encoding.UTF8.GetBytes(_configuration["JWT:Key"]);
+    var tokenDescriptor = new SecurityTokenDescriptor
+    {
+        Subject = new ClaimsIdentity(new Claim[]
         {
-            if (user == null || user.EmailAddress == null || user.Password == null
-                || user.EmailAddress == "" || user.Password == "")
-            {
-                throw new Exception("Must enter a email and password");
-            }
-
-            var userInDb = await _unitOfWork.Users.GetUserByEmail(user.EmailAddress);
-            if (userInDb == null)
-            {
-                throw new Exception("User doesn't exist");
-            }
-
-            string salt = userInDb.PasswordSalt;
-            string hashedPassword;
-            hashedPassword = HashPassword(user.Password, salt);
-
-            userInDb = await _unitOfWork.Users.GetUserByEmailAndHashedPassword(user.EmailAddress, hashedPassword);
-
-            if (userInDb == null)
-            {
-                throw new Exception("Incorrect password");
-            }
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var tokenKey = Encoding.UTF8.GetBytes(_configuration["JWT:Key"]);
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.Email, userInDb.EmailAddress),
-                    new Claim(ClaimTypes.Role, userInDb.Role.ToString())
-                }),
-                Expires = DateTime.UtcNow.AddMinutes(20),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(tokenKey),
-                SecurityAlgorithms.HmacSha256Signature),
-                Issuer = _configuration["JWT:Issuer"],
-                Audience = _configuration["JWT:Audience"]
-            };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return new Token { TokenString = tokenHandler.WriteToken(token) };
-        }
+            new Claim(ClaimTypes.Email, userInDb.EmailAddress),
+            new Claim(ClaimTypes.Role, userInDb.Role.ToString())
+        }),
+        Expires = DateTime.UtcNow.AddMinutes(20),
+        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(tokenKey),
+        SecurityAlgorithms.HmacSha256Signature),
+        Issuer = _configuration["JWT:Issuer"],
+        Audience = _configuration["JWT:Audience"]
+    };
+    var token = tokenHandler.CreateToken(tokenDescriptor);
+    return new Token { TokenString = tokenHandler.WriteToken(token) };
+}
 
         public async Task<User> Register(UserRegisterDTO user)
         {

@@ -54,6 +54,8 @@ namespace UnitTests
         [Test]
         public async Task GetUserByEmail_UserExists_ShouldReturnUserDto()
         {
+            _unitOfWorkMock.Setup(x => x.Users.GetUserByEmail(_email)).ReturnsAsync(new User() { EmailAddress = _email });
+
             var response = await _controller.GetUser(_email);
             var result = response as OkObjectResult;
 
@@ -74,6 +76,16 @@ namespace UnitTests
             Assert.That(result.StatusCode, Is.EqualTo(StatusCodes.Status404NotFound));
             Assert.That(result.Value, Is.EqualTo("User with this email doesn't exist"));
         }
+
+[Test]
+public void GetUserByEmail_UnresponsiveDb_ShouldReturnInternalServerError()
+{
+    _unitOfWorkMock.Setup(x => x.Users.GetUserByEmail(_email)).ThrowsAsync(new Exception());
+
+    var exception = Assert.ThrowsAsync<Exception>(async () => await _controller.GetUser(_email));
+
+    Assert.That(exception, Is.Not.Null);
+}
         
         [Test]
         public async Task AuthenticateUser_UserWithValidCredentials_ShouldReturnToken()

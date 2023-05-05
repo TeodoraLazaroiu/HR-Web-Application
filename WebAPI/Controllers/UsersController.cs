@@ -22,18 +22,18 @@ namespace API.Controllers
 			_service = service;
 		}
 
-		[HttpGet("{email}")]
-		public async Task<IActionResult> GetUser(string email)
-		{
-			var user = await _unitOfWork.Users.GetUserByEmail(email);
+[HttpGet("{email}")]
+public async Task<IActionResult> GetUser(string email)
+{
+	var user = await _unitOfWork.Users.GetUserByEmail(email);
 
-			if (user == null)
-			{
-				return NotFound("User with this email doesn't exist");
-			}
+	if (user == null)
+	{
+		return NotFound("User with this email doesn't exist");
+	}
 
-			return Ok(new UserDTO(user));
-		}
+	return Ok(new UserDTO(user));
+}
 
 		[HttpPost]
 		[AllowAnonymous]
